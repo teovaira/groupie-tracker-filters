@@ -1,0 +1,43 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{block "title" .}}Groupie Tracker{{end}}</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
+    <link rel="manifest" href="/static/site.webmanifest">
+    <link rel="stylesheet" href="/static/css/styles.css?v=2">
+</head>
+
+<body>
+
+    <header>
+        <div class="container">
+            <a href="/" class="site-logo">🎵 Groupie Tracker</a>
+            <nav>
+                <a href="/">Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            {{block "content" .}}{{end}}
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Made with ❤️ by Krystallenia, Vasiliki &amp; Theo · Zone01</p>
+        </div>
+    </footer>
+
+    <script src="/static/js/search.js"></script>
+
+</body>
+</html>
+{{end}}

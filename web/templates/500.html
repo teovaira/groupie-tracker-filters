@@ -1,0 +1,14 @@
+{{template "base" .}}
+
+{{define "title"}}500 · Something Went Wrong{{end}}
+
+{{define "content"}}
+
+<div class="error-page">
+    <span class="error-code error-code--500">500</span>
+    <h1>Something Went Wrong</h1>
+    <p>An unexpected error occurred on our end. Please try again in a moment.</p>
+    <a href="/" class="error-btn">Back to Home</a>
+</div>
+
+{{end}}

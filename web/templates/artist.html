@@ -1,0 +1,92 @@
+{{template "base" .}}
+
+{{define "title"}}{{.Artist.Name}} · Groupie Tracker{{end}}
+
+{{define "content"}}
+
+<a href="/" class="back-link">← Back to all artists</a>
+
+<div class="artist-detail">
+
+    <div class="artist-hero">
+        <img src="{{.Artist.Image}}" alt="{{.Artist.Name}}">
+        <div class="artist-hero-info">
+            <h1>{{.Artist.Name}}</h1>
+            <div class="artist-meta">
+                <div class="artist-meta-item">
+                    <span class="meta-label">Formed</span>
+                    <span class="meta-value">{{.Artist.CreationDate}}</span>
+                </div>
+                <div class="artist-meta-item">
+                    <span class="meta-label">First Album</span>
+                    <span class="meta-value">{{.Artist.FirstAlbum}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="artist-sections">
+
+        <section class="detail-section">
+            <h3>Members</h3>
+            {{if .Artist.Members}}
+            <ul class="members-list">
+                {{range .Artist.Members}}
+                <li>{{.}}</li>
+                {{end}}
+            </ul>
+            {{else}}
+            <p class="empty-state">No member information available.</p>
+            {{end}}
+        </section>
+
+        <section class="detail-section">
+            <h3>Locations</h3>
+            {{if .Locations}}
+            <div class="pill-grid">
+                {{range .Locations}}
+                <span class="pill">{{.}}</span>
+                {{end}}
+            </div>
+            {{else}}
+            <p class="empty-state">No location information available.</p>
+            {{end}}
+        </section>
+
+        <section class="detail-section">
+            <h3>Concert Dates</h3>
+            {{if .Dates}}
+            <div class="pill-grid">
+                {{range .Dates}}
+                <span class="pill pill--date">{{.}}</span>
+                {{end}}
+            </div>
+            {{else}}
+            <p class="empty-state">No date information available.</p>
+            {{end}}
+        </section>
+
+        <section class="detail-section detail-section--wide">
+            <h3>Dates by Location</h3>
+            {{if .DatesLocations}}
+            <div class="dateloc-grid">
+                {{range $location, $dates := .DatesLocations}}
+                <div class="dateloc-card">
+                    <span class="location-name">{{$location}}</span>
+                    <ul class="dates-list">
+                        {{range $dates}}
+                        <li>{{.}}</li>
+                        {{end}}
+                    </ul>
+                </div>
+                {{end}}
+            </div>
+            {{else}}
+            <p class="empty-state">No concert information available.</p>
+            {{end}}
+        </section>
+
+    </div>
+</div>
+
+{{end}}

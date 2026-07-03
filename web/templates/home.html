@@ -1,0 +1,37 @@
+{{template "base" .}}
+
+{{define "title"}}Groupie Tracker{{end}}
+
+{{define "content"}}
+
+<section class="search-section">
+    <input
+        type="text"
+        id="search-input"
+        class="search-bar"
+        placeholder="Search artists, members, locations, year..."
+        autocomplete="off"
+    >
+</section>
+
+<div id="loading" class="loading hidden">Searching...</div>
+
+<div id="no-results" class="no-results hidden">
+    <p>No artists found. Try a different search.</p>
+</div>
+
+<section id="search-results" class="artist-grid">
+    {{range .}}
+    <a href="/artist/{{.ID}}" class="artist-card">
+        <img src="{{.Image}}" alt="{{.Name}}">
+        <div class="artist-card-info">
+            <h2>{{.Name}}</h2>
+            <p>Since {{.CreationDate}}</p>
+        </div>
+    </a>
+    {{else}}
+    <p class="no-artists">No artists available.</p>
+    {{end}}
+</section>
+
+{{end}}

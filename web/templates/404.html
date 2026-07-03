@@ -1,0 +1,14 @@
+{{template "base" .}}
+
+{{define "title"}}404 · Page Not Found{{end}}
+
+{{define "content"}}
+
+<div class="error-page">
+    <span class="error-code">404</span>
+    <h1>Page Not Found</h1>
+    <p>The page you're looking for doesn't exist or has been moved.</p>
+    <a href="/" class="error-btn">Back to Home</a>
+</div>
+
+{{end}}

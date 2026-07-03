@@ -1,0 +1,634 @@
+/* ============================================================
+   GROUPIE TRACKER — STYLES
+   Structure:
+   1. Variables
+   2. Reset
+   3. Base / Typography
+   4. Layout
+   5. Header
+   6. Footer
+   7. Search
+   8. Artist Grid
+   9. Artist Card
+   10. Loading & States
+   11. Responsive
+   ============================================================ */
+
+
+/* ============================================================
+   1. VARIABLES
+   ============================================================ */
+
+:root {
+    /* Colors */
+    --color-bg:          #111111;
+    --color-surface:     #1e1e1e;
+    --color-surface-2:   #2a2a2a;
+    --color-border:      #333333;
+    --color-primary:     #f48fb1;
+    --color-text:        #f0f0f0;
+    --color-text-muted:  #888888;
+    --color-error:       #ff6b6b;
+
+    /* Spacing */
+    --space-xs:  0.25rem;
+    --space-sm:  0.5rem;
+    --space-md:  1rem;
+    --space-lg:  1.5rem;
+    --space-xl:  2rem;
+    --space-2xl: 3rem;
+    --space-3xl: 4rem;
+
+    /* Typography */
+    --font:           'Segoe UI', system-ui, -apple-system, sans-serif;
+    --font-size-sm:   0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg:   1.125rem;
+    --font-size-xl:   1.25rem;
+    --font-size-2xl:  1.5rem;
+    --font-size-3xl:  2rem;
+    --line-height:    1.6;
+
+    /* Borders */
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+
+    /* Transitions */
+    --transition: 0.2s ease;
+
+    /* Layout */
+    --container-max: 1200px;
+    --header-height: 64px;
+}
+
+
+/* ============================================================
+   2. RESET
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+ul {
+    list-style: none;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    font: inherit;
+}
+
+
+/* ============================================================
+   3. BASE / TYPOGRAPHY
+   ============================================================ */
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height);
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+h1 { font-size: var(--font-size-3xl); line-height: 1.2; }
+h2 { font-size: var(--font-size-xl);  line-height: 1.3; }
+h3 { font-size: var(--font-size-lg);  line-height: 1.4; }
+
+p {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+}
+
+
+/* ============================================================
+   4. LAYOUT
+   ============================================================ */
+
+.container {
+    width: 100%;
+    max-width: var(--container-max);
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+}
+
+main {
+    flex: 1;
+    padding: var(--space-2xl) 0;
+}
+
+
+/* ============================================================
+   5. HEADER
+   ============================================================ */
+
+header {
+    height: var(--header-height);
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+header .container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.site-logo {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--color-primary);
+    letter-spacing: -0.5px;
+}
+
+.site-logo:hover {
+    opacity: 0.85;
+}
+
+nav a {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--color-text-muted);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+    transition: color var(--transition), background-color var(--transition);
+}
+
+nav a:hover {
+    color: var(--color-text);
+    background-color: var(--color-surface-2);
+}
+
+
+/* ============================================================
+   6. FOOTER
+   ============================================================ */
+
+footer {
+    background-color: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-lg) 0;
+    text-align: center;
+}
+
+footer p {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+}
+
+
+/* ============================================================
+   7. SEARCH
+   ============================================================ */
+
+.search-section {
+    margin-bottom: var(--space-2xl);
+}
+
+.search-bar {
+    width: 100%;
+    padding: var(--space-md) var(--space-lg);
+    font-size: var(--font-size-lg);
+    font-family: var(--font);
+    color: var(--color-text);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.search-bar::placeholder {
+    color: var(--color-text-muted);
+}
+
+.search-bar:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(244, 143, 177, 0.15);
+}
+
+
+/* ============================================================
+   8. ARTIST GRID
+   ============================================================ */
+
+.artist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--space-lg);
+}
+
+
+/* ============================================================
+   9. ARTIST CARD
+   ============================================================ */
+
+.artist-card {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+
+.artist-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--color-primary);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.artist-card img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+}
+
+.artist-card-info {
+    padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.artist-card-info h2 {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.artist-card-info p {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+}
+
+
+/* ============================================================
+   10. LOADING & STATES
+   ============================================================ */
+
+.hidden {
+    display: none;
+}
+
+.loading {
+    text-align: center;
+    padding: var(--space-xl);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    letter-spacing: 0.05em;
+}
+
+.no-results {
+    text-align: center;
+    padding: var(--space-3xl) var(--space-lg);
+}
+
+.no-results p {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-muted);
+}
+
+.no-artists {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--space-3xl);
+    font-size: var(--font-size-lg);
+    color: var(--color-text-muted);
+}
+
+
+/* ============================================================
+   11. ARTIST DETAIL PAGE
+   ============================================================ */
+
+.back-link {
+    display: inline-block;
+    margin-bottom: var(--space-xl);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    transition: color var(--transition);
+}
+
+.back-link:hover {
+    color: var(--color-primary);
+}
+
+.artist-detail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xl);
+}
+
+/* Hero — image + name + meta */
+.artist-hero {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    align-items: flex-start;
+}
+
+.artist-hero img {
+    width: 100%;
+    max-width: 320px;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+}
+
+.artist-hero-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.artist-hero-info h1 {
+    color: var(--color-text);
+}
+
+.artist-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.artist-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-sm) var(--space-md);
+    min-width: 120px;
+}
+
+.meta-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.meta-value {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+/* Sections — members, locations, dates */
+.artist-sections {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+}
+
+.detail-section {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-xl);
+}
+
+.detail-section h3 {
+    color: var(--color-text);
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-border);
+}
+
+/* Members — flat list with subtle left accent */
+.members-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.members-list li {
+    font-size: var(--font-size-base);
+    color: var(--color-text);
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--color-surface-2);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--color-border);
+    transition: border-color var(--transition);
+}
+
+.members-list li:hover {
+    border-left-color: var(--color-primary);
+}
+
+/* Pills — locations and dates as compact badges */
+.pill-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+}
+
+.pill {
+    display: inline-block;
+    padding: var(--space-xs) var(--space-md);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--color-text);
+    background-color: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: border-color var(--transition), color var(--transition);
+}
+
+.pill:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.pill--date {
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+}
+
+.pill--date:hover {
+    color: var(--color-primary);
+}
+
+/* Dates by Location — card grid */
+.dateloc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-md);
+}
+
+.dateloc-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    background-color: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    border-top: 3px solid var(--color-primary);
+}
+
+.location-name {
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.dates-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.dates-list li {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    padding: 2px 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.empty-state {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    font-style: italic;
+}
+
+
+/* ============================================================
+   12. RESPONSIVE
+   ============================================================ */
+
+/* Tablet — 768px and up */
+@media (min-width: 768px) {
+    .artist-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+
+    .artist-hero {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    .artist-hero img {
+        width: 280px;
+        flex-shrink: 0;
+    }
+
+    .artist-sections {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .detail-section--wide {
+        grid-column: 1 / -1;
+    }
+}
+
+/* Desktop — 1280px and up */
+@media (min-width: 1280px) {
+    .artist-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    .artist-sections {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .detail-section--wide {
+        grid-column: 1 / -1;
+    }
+}
+
+
+/* ============================================================
+   13. ERROR PAGES
+   ============================================================ */
+
+.error-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-3xl) var(--space-lg);
+    gap: var(--space-lg);
+}
+
+.error-code {
+    font-size: 8rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--color-primary);
+    letter-spacing: -4px;
+}
+
+.error-code--400 {
+    color: #ffb347;
+}
+
+.error-code--500 {
+    color: var(--color-error);
+}
+
+.error-page h1 {
+    color: var(--color-text);
+}
+
+.error-page p {
+    max-width: 400px;
+    font-size: var(--font-size-base);
+    color: var(--color-text-muted);
+}
+
+.error-btn {
+    margin-top: var(--space-md);
+    padding: var(--space-sm) var(--space-xl);
+    background-color: var(--color-primary);
+    color: var(--color-bg);
+    font-weight: 600;
+    font-size: var(--font-size-base);
+    border-radius: var(--radius-lg);
+    transition: opacity var(--transition);
+}
+
+.error-btn:hover {
+    opacity: 0.85;
+}
