@@ -14,6 +14,7 @@ type RealStore struct {
 	Locations models.LocationsResponse
 	Dates     models.DatesResponse
 	Relations models.RelationResponse
+	Markers   map[int][]models.Marker
 }
 
 // AllArtists returns the full list of artists held in memory.
@@ -91,11 +92,14 @@ func (r *RealStore) ArtistPageDataByID(id int) (models.ArtistPageData, bool) {
 					datesLocations = rel.DatesLocations
 				}
 			}
+			markers := r.Markers[id]
+
 			return models.ArtistPageData{
 				Artist:         a,
 				Locations:      locations,
 				Dates:          dates,
 				DatesLocations: datesLocations,
+				Markers:        markers,
 			}, true
 		}
 	}
