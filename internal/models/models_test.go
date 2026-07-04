@@ -69,12 +69,16 @@ func TestArtistPageData_EmptySlices(t *testing.T) {
 		Artist:    Artist{ID: 1, Name: "Test"},
 		Locations: []string{},
 		Dates:     []string{},
+		Markers:   []Marker{},
 	}
 	if len(p.Locations) != 0 {
 		t.Errorf("expected empty locations")
 	}
 	if len(p.Dates) != 0 {
 		t.Errorf("expected empty dates")
+	}
+	if len(p.Markers) != 0 {
+		t.Errorf("expected empty markers")
 	}
 }
 
@@ -85,5 +89,15 @@ func TestArtistPageData_NilSlices(t *testing.T) {
 	}
 	if p.Dates != nil {
 		t.Errorf("expected nil dates")
+	}
+	if p.Markers != nil {
+		t.Errorf("expected nil markers")
+	}
+}
+
+func TestMarker(t *testing.T) {
+	m := Marker{Name: "london-uk", Lat: 51.5074, Lng: -0.1278}
+	if m.Name != "london-uk" || m.Lat != 51.5074 || m.Lng != -0.1278 {
+		t.Errorf("unexpected marker: %+v", m)
 	}
 }

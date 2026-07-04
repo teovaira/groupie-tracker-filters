@@ -70,7 +70,8 @@ func matchesQuery(a models.Artist, query string) bool {
 
 // ArtistPageDataByID looks up an artist by ID and assembles the ArtistPageData
 // view model by joining locations, dates, and relations data from their respective
-// index slices. Returns false if no artist with the given ID exists.
+// index slices, and attaching the pre-geocoded markers from the Markers map.
+// Returns false if no artist with the given ID exists.
 func (r *RealStore) ArtistPageDataByID(id int) (models.ArtistPageData, bool) {
 	for _, a := range r.AllArtists() {
 		if a.ID == id {
