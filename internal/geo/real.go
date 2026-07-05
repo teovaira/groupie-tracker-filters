@@ -10,7 +10,7 @@ import (
 
 // RealGeocoder is the production implementation of the Geocoder interface.
 // It resolves addresses by querying a Nominatim-compatible HTTP endpoint.
-// BaseURL and Client are exposed so that tests can inject a local server
+// BaseURL and Client are exported so that tests can inject a local server
 // without making real network requests.
 type RealGeocoder struct {
 	BaseURL string
@@ -33,10 +33,10 @@ func NewRealGeocoder(baseURL string) *RealGeocoder {
 	}
 }
 
-// Geocode appends the address as a query parameter to BaseURL, calls the
-// endpoint, and parses the first result into a Coordinates pair.
-// It returns an error if the address cannot be resolved or the response
-// cannot be decoded.
+// Geocode builds a request to BaseURL with the address as the q parameter,
+// sets a User-Agent header, and parses the first result into a Coordinates pair.
+// It returns an error if the HTTP request fails, the response status is not 200,
+// no results are returned, or the response body cannot be decoded.
 func (g *RealGeocoder) Geocode(address string) (Coordinates, error) {
 	u, err := url.Parse(g.BaseURL)
 	if err != nil {
