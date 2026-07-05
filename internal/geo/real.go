@@ -46,11 +46,21 @@ func (g *RealGeocoder) Geocode(address string) (Coordinates, error) {
 	q.Set("q", address)
 	q.Set("format", "json")
 	u.RawQuery = q.Encode()
-	resp, err := g.Client.Get(u.String())
+
+	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
+	if err != nil {
+		return Coordinates{}, err
+	}
+	req.Header.Set("User-Agent", "groupie-tracker-geolocalization")
+	resp, err := g.Client.Do(req)
 	if err != nil {
 		return Coordinates{}, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return Coordinates{}, fmt.Errorf("geocoding request for %q failed: status %d %s", address, resp.StatusCode, resp.Status)
+	}
 	var places []placeResult
 	if err := json.NewDecoder(resp.Body).Decode(&places); err != nil {
 		return Coordinates{}, err
