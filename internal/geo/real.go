@@ -8,21 +8,35 @@ import (
 	"strconv"
 )
 
+// RealGeocoder is the production implementation of the Geocoder interface.
+// It resolves addresses by querying a Nominatim-compatible HTTP endpoint.
+// BaseURL and Client are exposed so that tests can inject a local server
+// without making real network requests.
 type RealGeocoder struct {
 	BaseURL string
 	Client  *http.Client
 }
+
+// placeResult maps the lat/lon fields returned by the Nominatim JSON response.
 type placeResult struct {
 	Lat string `json:"lat"`
 	Lon string `json:"lon"`
 }
 
+// NewRealGeocoder returns a RealGeocoder pointed at baseURL with a default
+// HTTP client. Pass the Nominatim search endpoint as baseURL
+// (e.g. "https://nominatim.openstreetmap.org/search").
 func NewRealGeocoder(baseURL string) *RealGeocoder {
 	return &RealGeocoder{
 		BaseURL: baseURL,
 		Client:  &http.Client{},
 	}
 }
+
+// Geocode appends the address as a query parameter to BaseURL, calls the
+// endpoint, and parses the first result into a Coordinates pair.
+// It returns an error if the address cannot be resolved or the response
+// cannot be decoded.
 func (g *RealGeocoder) Geocode(address string) (Coordinates, error) {
 	u, err := url.Parse(g.BaseURL)
 	if err != nil {
