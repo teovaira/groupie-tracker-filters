@@ -10,12 +10,17 @@ import (
 	"net/http"
 
 	"groupie-tracker/internal/api"
+	"groupie-tracker/internal/geo"
 	"groupie-tracker/internal/handlers"
+	"groupie-tracker/internal/models"
 	"groupie-tracker/internal/store"
 )
 
 // addr is the TCP address the HTTP server listens on.
-const addr = ":8080"
+const (
+	addr        = ":8080"
+	geocoderURL = "https://nominatim.openstreetmap.org/search"
+)
 
 // main loads all data from the external API, wires up the dependency graph
 // (store, templates, handlers, middleware), and starts the HTTP server.
@@ -26,11 +31,32 @@ func main() {
 	}
 
 	d := api.GetData()
+	geocoder := geo.NewRealGeocoder(geocoderURL)
+	markersByArtistID := make(map[int][]models.Marker)
+	for _, entry := range d.Locations.Index {
+		artistID := entry.ID
+		var markers []models.Marker
+		for _, location := range entry.Locations {
+			coords, err := geocoder.Geocode(location)
+			if err != nil {
+				log.Printf("failed to geocode %q: %v", location, err)
+				continue
+			}
+			marker := models.Marker{
+				Name: location,
+				Lat:  coords.Latitude,
+				Lng:  coords.Longitude,
+			}
+			markers = append(markers, marker)
+		}
+		markersByArtistID[artistID] = markers
+	}
 	s := &store.RealStore{
 		Artists:   d.Artists,
 		Locations: d.Locations,
 		Dates:     d.Dates,
 		Relations: d.Relations,
+		Markers:   markersByArtistID,
 	}
 	log.Printf("Data loaded: %d artists", len(d.Artists))
 	homeTmpl := template.Must(template.ParseFiles(
