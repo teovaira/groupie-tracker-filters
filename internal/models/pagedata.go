@@ -12,4 +12,5 @@ type ArtistPageData struct {
 	Dates          []string
 	DatesLocations map[string][]string
 	Markers        []Marker
+	MarkersJSON    string
 }

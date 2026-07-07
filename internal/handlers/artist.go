@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bytes"
+	"encoding/json"
 	"html/template"
 	"net/http"
 	"strconv"
@@ -43,7 +44,12 @@ func (h *ArtistHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		NotFoundHandler(h.notFoundTmpl)(w, r)
 		return
 	}
-
+	markersJSON, err := json.Marshal(data.Markers)
+	if err != nil {
+		http.Error(w, "internal server error", http.StatusInternalServerError)
+		return
+	}
+	data.MarkersJSON = string(markersJSON)
 	var buf bytes.Buffer
 	if err := h.tmpl.ExecuteTemplate(&buf, "base", data); err != nil {
 		http.Error(w, "internal server error", http.StatusInternalServerError)
