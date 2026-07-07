@@ -8,6 +8,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"time"
 
 	"groupie-tracker/internal/api"
 	"groupie-tracker/internal/geo"
@@ -18,8 +19,9 @@ import (
 
 // addr is the TCP address the HTTP server listens on.
 const (
-	addr        = ":8080"
-	geocoderURL = "https://nominatim.openstreetmap.org/search"
+	addr         = ":8080"
+	geocoderURL  = "https://nominatim.openstreetmap.org/search"
+	geoCachePath = "data/geocache.json"
 )
 
 // main loads all data from the external API, wires up the dependency graph
@@ -31,26 +33,50 @@ func main() {
 	}
 
 	d := api.GetData()
+
 	geocoder := geo.NewRealGeocoder(geocoderURL)
+
+	cache, err := geo.NewCache(geoCachePath)
+	if err != nil {
+		log.Fatalf("failed to load geocoder cache: %v", err)
+	}
+
 	markersByArtistID := make(map[int][]models.Marker)
+
 	for _, entry := range d.Locations.Index {
 		artistID := entry.ID
 		var markers []models.Marker
+
 		for _, location := range entry.Locations {
-			coords, err := geocoder.Geocode(location)
-			if err != nil {
-				log.Printf("failed to geocode %q: %v", location, err)
-				continue
+
+			coords, ok := cache.Get(location)
+			if !ok {
+				coords, err = geocoder.Geocode(location)
+				if err != nil {
+					log.Printf("failed to geocode %q: %v", location, err)
+					continue
+				}
+
+				cache.Set(location, coords)
+				time.Sleep(1100 * time.Millisecond)
 			}
+
 			marker := models.Marker{
 				Name: location,
 				Lat:  coords.Latitude,
 				Lng:  coords.Longitude,
 			}
+
 			markers = append(markers, marker)
 		}
+
 		markersByArtistID[artistID] = markers
 	}
+
+	if err := cache.Save(); err != nil {
+		log.Printf("failed to save geocoder cache: %v", err)
+	}
+
 	s := &store.RealStore{
 		Artists:   d.Artists,
 		Locations: d.Locations,
@@ -58,7 +84,9 @@ func main() {
 		Relations: d.Relations,
 		Markers:   markersByArtistID,
 	}
+
 	log.Printf("Data loaded: %d artists", len(d.Artists))
+
 	homeTmpl := template.Must(template.ParseFiles(
 		"web/templates/base.html",
 		"web/templates/home.html",
@@ -68,14 +96,17 @@ func main() {
 		"web/templates/base.html",
 		"web/templates/artist.html",
 	))
+
 	notFoundTmpl := template.Must(template.ParseFiles(
 		"web/templates/base.html",
 		"web/templates/404.html",
 	))
+
 	serverErrorTmpl := template.Must(template.ParseFiles(
 		"web/templates/base.html",
 		"web/templates/500.html",
 	))
+
 	badRequestTmpl := template.Must(template.ParseFiles(
 		"web/templates/base.html",
 		"web/templates/400.html",
@@ -84,7 +115,10 @@ func main() {
 	homeHandler := handlers.NewHomeHandler(s, homeTmpl)
 	notFoundHandler := handlers.NotFoundHandler(notFoundTmpl)
 	artistHandler := handlers.NewArtistHandler(s, artistTmpl, notFoundTmpl)
-	searchHandler := &handlers.SearchHandler{Store: s, BadRequestTmpl: badRequestTmpl}
+	searchHandler := &handlers.SearchHandler{
+		Store:          s,
+		BadRequestTmpl: badRequestTmpl,
+	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -98,12 +132,10 @@ func main() {
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
 	mux.HandleFunc("GET /api/search", searchHandler.Search)
 
-	// mux.HandleFunc("GET /panic-test", func(w http.ResponseWriter, r *http.Request) {
-	// 	panic("intentional test panic")
-	// })
-
 	log.Printf("server listening on http://localhost%s", addr)
-	if err := http.ListenAndServe(addr, handlers.RecoveryMiddleware(serverErrorTmpl, mux)); err != nil && !errors.Is(err, http.ErrServerClosed) {
+
+	if err := http.ListenAndServe(addr, handlers.RecoveryMiddleware(serverErrorTmpl, mux)); err != nil &&
+		!errors.Is(err, http.ErrServerClosed) {
 		log.Fatalf("server error: %v", err)
 	}
 }
