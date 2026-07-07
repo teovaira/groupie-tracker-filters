@@ -28,3 +28,6 @@ go.work
 
 # Editor
 .vscode/
+
+# Generated at runtime
+data/geocache.json
