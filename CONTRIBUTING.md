@@ -34,6 +34,7 @@ Example: `feat(handlers): implement GET /artist/{id} handler`
 - Go: follow standard conventions (`gofmt`, exported names PascalCase, errors lowercase)
 - Only standard library packages — no external dependencies
 - Functions under 50 lines
+- Frontend: vanilla JS/CSS, except Leaflet (loaded via CDN) for map rendering
 
 ## Package Ownership
 
