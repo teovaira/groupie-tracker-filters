@@ -1,39 +1,43 @@
-# Groupie Tracker
+# Groupie Tracker Geolocalization
 
-A web app that fetches data from a music API and displays artists, their members, concert locations, and dates.
+An extension of Groupie Tracker that geocodes each artist's concert locations and plots them on an interactive map.
 
 ## About
 
-Groupie Tracker consumes a REST API with four endpoints — artists, locations, dates, and relations — and presents the data through a clean, browsable website. It includes a live search feature that queries the backend without a full page reload.
+Groupie Tracker Geolocalization builds on the base project by resolving each concert location string (e.g. "san_francisco-usa") into real-world coordinates using the Nominatim geocoding service, then rendering them as markers on a per-artist map. Geocoded results are cached to disk so repeated runs don't re-query the geocoding service for locations already resolved.
 
-Built with Go (standard library only) and plain HTML/CSS/JS.
+Built with Go (standard library only) and plain HTML/CSS/JS, using Leaflet for map rendering.
 
 ## Quick Start
 
 **Prerequisites:** Go 1.22+
 
 ```bash
-git clone https://github.com/vxanthio/groupie-tracker.git
-cd groupie-tracker
-go build -o groupie-tracker ./cmd
-./groupie-tracker
+git clone https://github.com/vxanthio/groupie-tracker-geolocalization.git
+cd groupie-tracker-geolocalization
+go build -o groupie-tracker-geolocalization ./cmd
+./groupie-tracker-geolocalization
 ```
 
 Visit `http://localhost:8080`
 
 ## Features
 
-- Browse all artists as cards on the home page
-- View artist detail: members, creation year, first album, concert locations, dates, and dates grouped by location
-- Live search — filter artists by name, member, location, or year without page reload
-- Styled error pages for 400, 404, and 500 responses
+- Everything from the base Groupie Tracker project
+- Concert locations geocoded into latitude/longitude coordinates
+- Interactive map on each artist page with a marker per concert location
+- Disk-backed geocoding cache — avoids re-querying already-resolved locations across restarts
+- Rate-limited geocoding requests to respect the Nominatim usage policy
+- Graceful handling of unresolvable locations — a failed geocode is logged and skipped without breaking the rest of the map
 
 ## Project Structure
 
 ```
 cmd/                  entry point
+data/                 geocoding cache (geocache.json)
 internal/
   api/                external API client
+  geo/                geocoder interface, real/mock implementations, cache
   handlers/           HTTP handlers
   models/             data structs
   store/              data layer + Store interface
@@ -52,7 +56,7 @@ make check      # full pre-PR check (fmt + lint + build + test)
 
 ## Team
 
-- **Vasiliki** — Backend: API client, models, store, search handler
+- **Vasiliki** — Backend: API client, models, store, search handler,geo package
 - **Krysta** — Frontend: templates, CSS
 - **Theo** — Full-stack: handlers, search.js, docs, QA
 
