@@ -52,13 +52,13 @@ func main() {
 			coords, ok := cache.Get(location)
 			if !ok {
 				coords, err = geocoder.Geocode(location)
+				time.Sleep(1100 * time.Millisecond)
 				if err != nil {
 					log.Printf("failed to geocode %q: %v", location, err)
 					continue
 				}
 
 				cache.Set(location, coords)
-				time.Sleep(1100 * time.Millisecond)
 			}
 
 			marker := models.Marker{
