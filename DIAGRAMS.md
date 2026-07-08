@@ -22,11 +22,53 @@ flowchart TD
     I -->|loaded once at startup| J[api.LoadData]
     J -->|fetch| K([groupietrackers API])
 
+    I -->|markers loaded once at startup| R[Geocoding Pipeline]
+    R --> S{cache.Get}
+    S -->|hit| T[Coordinates]
+    S -->|miss| U[geocoder.Geocode]
+    U -->|normalize + rate-limit| V([Nominatim API])
+    U --> W[cache.Set]
+    W --> T
+    T --> R
+
     B -->|render| L[home.html]
     C -->|render| M[artist.html]
 
     L -->|extends| N[base.html]
     M -->|extends| N
+
+    M -->|MarkersJSON| X[map.js + Leaflet]
+```
+
+## Startup Lifecycle — Geocoding
+
+```mermaid
+sequenceDiagram
+    participant M as main.go
+    participant API as api.LoadData
+    participant C as geo.Cache
+    participant G as geo.RealGeocoder
+    participant N as Nominatim
+
+    M->>API: LoadData()
+    API-->>M: artists, locations, dates, relations
+    M->>C: NewCache(geoCachePath)
+    loop for each artist location
+        M->>C: Get(location)
+        alt cache hit
+            C-->>M: Coordinates
+        else cache miss
+            M->>G: Geocode(location)
+            G->>G: normalizeLocation(location)
+            G->>N: GET /search?q=...
+            N-->>G: [{lat, lon}] or []
+            G-->>M: Coordinates or error
+            M->>M: sleep 1.1s (rate limit)
+            M->>C: Set(location, coords)
+        end
+    end
+    M->>C: Save()
+    M->>M: build RealStore with Markers
 ```
 
 ## Request Lifecycle — Live Search
