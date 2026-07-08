@@ -49,7 +49,7 @@ func (h *ArtistHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
-	data.MarkersJSON = string(markersJSON)
+	data.MarkersJSON = template.JS(markersJSON)
 	var buf bytes.Buffer
 	if err := h.tmpl.ExecuteTemplate(&buf, "base", data); err != nil {
 		http.Error(w, "internal server error", http.StatusInternalServerError)
