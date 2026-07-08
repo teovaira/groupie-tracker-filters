@@ -43,7 +43,7 @@ func (g *RealGeocoder) Geocode(address string) (Coordinates, error) {
 		return Coordinates{}, err
 	}
 	q := u.Query()
-	q.Set("q", address)
+	q.Set("q", normalizeLocation(address))
 	q.Set("format", "json")
 	u.RawQuery = q.Encode()
 
