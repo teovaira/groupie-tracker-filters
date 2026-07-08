@@ -154,3 +154,40 @@ Search artists by name, member, location, or creation year.
 **Notes**
 - Returns empty array `[]` when no artists match — never `null`
 - Field names are exact — do not rename without team sync
+
+---
+
+## External: Nominatim Geocoding
+
+Base URL: `https://nominatim.openstreetmap.org/search`
+
+Used internally by `internal/geo.RealGeocoder` to resolve concert location
+strings into coordinates. Not exposed as an endpoint of this application —
+called server-side at startup only.
+
+**Request**
+
+| Parameter | Type     | Description                           |
+|-----------|----------|----------------------------------------|
+| `q`       | `string` | Address to geocode (normalized first) |
+| `format`  | `string` | Always `"json"`                        |
+
+**Response** `200 OK`
+```json
+[
+  {
+    "lat": "51.5074",
+    "lon": "-0.1278"
+  }
+]
+```
+
+| Field | Type     | Description                                |
+|-------|----------|---------------------------------------------|
+| `lat` | `string` | Latitude, returned as a string, not float   |
+| `lon` | `string` | Longitude, returned as a string, not float  |
+
+**Notes**
+- Returns an empty array `[]` when no match is found — not an error status
+- Usage policy caps requests at 1/second; requires a descriptive `User-Agent` header
+- Only the first result in the array is used
