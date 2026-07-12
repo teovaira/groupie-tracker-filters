@@ -104,7 +104,7 @@ test('does nothing when #map element is missing', () => {
     global.document = { getElementById: () => null, addEventListener: () => {} };
     global.L = { map() { throw new Error('L.map should not be called'); } };
     const initMap = loadInitMap();
-    initMap(); // should not throw
+    initMap();
 });
 
 test('does nothing when artist-markers element is missing', () => {
@@ -114,7 +114,7 @@ test('does nothing when artist-markers element is missing', () => {
     };
     global.L = { map() { throw new Error('L.map should not be called'); } };
     const initMap = loadInitMap();
-    initMap(); // should not throw
+    initMap();
 });
 
 test('initialises map with default world view', () => {
