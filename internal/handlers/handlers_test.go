@@ -32,6 +32,10 @@ func (s *testStore) SearchArtists(query string) []models.Artist {
 	return s.artists
 }
 
+func (s *testStore) FilterArtists(query string, criteria store.FilterCriteria) []models.Artist {
+	return s.artists
+}
+
 func (s *testStore) ArtistPageDataByID(id int) (models.ArtistPageData, bool) {
 	for _, a := range s.artists {
 		if a.ID == id {
