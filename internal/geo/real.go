@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 )
 
 // RealGeocoder is the production implementation of the Geocoder interface.
@@ -29,7 +30,7 @@ type placeResult struct {
 func NewRealGeocoder(baseURL string) *RealGeocoder {
 	return &RealGeocoder{
 		BaseURL: baseURL,
-		Client:  &http.Client{},
+		Client:  &http.Client{Timeout: 10 * time.Second},
 	}
 }
 
