@@ -45,9 +45,14 @@ function renderCards(artists) {
     return html;
 }
 
-// Expose pure functions globally so search.test.js can import them.
-window.debounce = debounce;
-window.renderCards = renderCards;
+// Expose pure functions for search.test.js to import under Node, and
+// globally in the browser where search.test.js runs them directly.
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { debounce, renderCards };
+} else {
+    window.debounce = debounce;
+    window.renderCards = renderCards;
+}
 
 // init wires the search input to the live search API.
 function init() {
@@ -102,4 +107,6 @@ function init() {
     input.addEventListener('input', debounce(handleInput, 300));
 }
 
-document.addEventListener('DOMContentLoaded', init);
+if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', init);
+}
