@@ -47,6 +47,20 @@ func (r *RealStore) SearchArtists(query string) []models.Artist {
 	return result
 }
 
+// FilterArtists filters the artist list by query using the same matchesQuery
+// function as SearchArtists. Structured criteria matching is added in a later
+// change; until then, criteria is accepted but not yet applied, so passing a
+// zero-value FilterCriteria alongside an empty query returns every artist.
+func (r *RealStore) FilterArtists(query string, criteria FilterCriteria) []models.Artist {
+	var result []models.Artist
+	for _, a := range r.AllArtists() {
+		if matchesQuery(a, query) {
+			result = append(result, a)
+		}
+	}
+	return result
+}
+
 // matchesQuery performs a case-insensitive substring search across the artist's
 // name, individual member names, creation date, and first album date.
 // It returns true as soon as any field matches, without checking the rest.
