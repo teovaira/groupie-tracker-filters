@@ -18,7 +18,7 @@ go build ./... # verify compilation
 
 ## Architecture
 
-- Entry point: `cmd/main.go` — loads data, builds store, registers routes
+- Entry point: `cmd/main.go` — loads data, geocodes concert locations, builds store, registers routes
 - Handlers: `internal/handlers/` — one file per route, injectable store + template
 - Store: `internal/store/` — `Store` interface, `RealStore`, `MockStore`
 - Models: `internal/models/` — data structs matching the external API
@@ -35,8 +35,10 @@ go build ./... # verify compilation
 - Never add external Go packages
 - Never modify another team member's files (see CONTRIBUTING.md)
 - Never remove the rate-limit delay in the geocoding loop (`cmd/main.go`) — Nominatim's usage policy caps requests at 1/second; removing or misplacing the delay risks the app getting rate-limited or blocked
+- Never remove the HTTP client timeout on `RealGeocoder` — an unbounded request can hang startup indefinitely with no error logged
 - Always set a `User-Agent` header on any request to the geocoding service
 - Geocoding failures must never abort the whole loop — log and skip the failed location, continue with the rest
+- `data/geocache.json` is intentionally committed (not gitignored) — it's a pre-warmed cache so the app starts instantly without live-geocoding on first run. Don't delete it or re-add it to `.gitignore` without discussing with the team.
 
 ## Testing
 
