@@ -15,11 +15,18 @@ Built with Go (standard library only) and plain HTML/CSS/JS, using Leaflet for m
 ```bash
 git clone https://github.com/vxanthio/groupie-tracker-geolocalization.git
 cd groupie-tracker-geolocalization
-go build -o groupie-tracker-geolocalization ./cmd
-./groupie-tracker-geolocalization
+
+# run directly (no build step)
+go run ./cmd
+
+# or build a binary first
+make build
+./bin/groupie-tracker-geolocalization
 ```
 
 Visit `http://localhost:8080`
+
+First run is instant — `data/geocache.json` ships pre-populated. If you delete it, the app will re-geocode every location live against Nominatim (~1 request/second, so a few minutes depending on data size).
 
 ## Features
 
@@ -56,7 +63,7 @@ make check      # full pre-PR check (fmt + lint + build + test)
 
 ## Team
 
-- **Vasiliki** — Backend: API client, models, store, search handler,geo package
+- **Vasiliki** — Backend: API client, models, store, search handler, geo package
 - **Krysta** — Frontend: templates, CSS
 - **Theo** — Full-stack: handlers, search.js, docs, QA
 
