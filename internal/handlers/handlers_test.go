@@ -40,6 +40,8 @@ func (s *testStore) ArtistPageDataByID(id int) (models.ArtistPageData, bool) {
 				Locations:      []string{},
 				Dates:          []string{},
 				DatesLocations: map[string][]string{},
+				Markers:        []models.Marker{{Name: "london-uk", Lat: 51.5074, Lng: -0.1278}},
+				MarkersJSON:    template.JS(`[{"Name":"london-uk","Lat":51.5074,"Lng":-0.1278}]`),
 			}, true
 		}
 	}
@@ -175,6 +177,15 @@ func TestArtistHandler(t *testing.T) {
 			tmpl:             artistTmpl,
 			wantStatusCode:   http.StatusNotFound,
 			wantBodyContains: []string{},
+		},
+		{
+			name:             "markers_json_present_in_body",
+			url:              "/artist/1",
+			pathID:           "1",
+			artists:          artists,
+			tmpl:             mustParseTemplate(`{{.MarkersJSON}}`),
+			wantStatusCode:   http.StatusOK,
+			wantBodyContains: []string{`london-uk`},
 		},
 		{
 			name:             "template_error_returns_500",

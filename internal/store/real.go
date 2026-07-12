@@ -96,6 +96,9 @@ func (r *RealStore) ArtistPageDataByID(id int) (models.ArtistPageData, bool) {
 				}
 			}
 			markers := r.Markers[id]
+			if markers == nil {
+				markers = []models.Marker{}
+			}
 			markersJSON, err := json.Marshal(markers)
 			if err != nil {
 				markersJSON = []byte("[]")
@@ -105,6 +108,7 @@ func (r *RealStore) ArtistPageDataByID(id int) (models.ArtistPageData, bool) {
 				Locations:      locations,
 				Dates:          dates,
 				DatesLocations: datesLocations,
+				Markers:        markers,
 				MarkersJSON:    template.JS(markersJSON),
 			}, true
 		}

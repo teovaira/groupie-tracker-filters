@@ -2,6 +2,7 @@ package store
 
 import (
 	"groupie-tracker/internal/models"
+	"strings"
 	"testing"
 )
 
@@ -54,6 +55,7 @@ func TestRealStore_ArtistPageDataByID(t *testing.T) {
 	s := &RealStore{
 		Artists: []models.Artist{
 			{ID: 1, Name: "Queen", Members: []string{"Freddie Mercury"}, CreationDate: 1970, FirstAlbum: "14-12-1973"},
+			{ID: 2, Name: "Billie Eilish", Members: []string{"Billie Eilish"}, CreationDate: 2015, FirstAlbum: "26-03-2017"},
 		},
 		Locations: models.LocationsResponse{
 			Index: []models.Locations{{ID: 1, Locations: []string{"london-uk", "paris-france"}}},
@@ -67,6 +69,12 @@ func TestRealStore_ArtistPageDataByID(t *testing.T) {
 				"paris-france": {"10-03-2020"},
 			}}},
 		},
+		Markers: map[int][]models.Marker{
+			1: {
+				{Name: "london-uk", Lat: 51.5074, Lng: -0.1278},
+				{Name: "paris-france", Lat: 48.8566, Lng: 2.3522},
+			},
+		},
 	}
 
 	tests := []struct {
@@ -75,6 +83,7 @@ func TestRealStore_ArtistPageDataByID(t *testing.T) {
 		wantFound          bool
 		wantLocations      []string
 		wantDatesLocations map[string][]string
+		wantMarkersJSON    string
 	}{
 		{
 			name:          "known_id_returns_data",
@@ -85,11 +94,20 @@ func TestRealStore_ArtistPageDataByID(t *testing.T) {
 				"london-uk":    {"*06-03-2020", "07-03-2020"},
 				"paris-france": {"10-03-2020"},
 			},
+			wantMarkersJSON: "london-uk",
 		},
 		{
 			name:      "unknown_id_returns_false",
 			id:        99,
 			wantFound: false,
+		},
+		{
+			name:               "known_id_no_markers_returns_empty_json",
+			id:                 2,
+			wantFound:          true,
+			wantLocations:      []string{},
+			wantDatesLocations: map[string][]string{},
+			wantMarkersJSON:    "[]",
 		},
 	}
 
@@ -117,6 +135,12 @@ func TestRealStore_ArtistPageDataByID(t *testing.T) {
 				if len(got) != len(dates) {
 					t.Errorf("DatesLocations[%q] = %v, want %v", loc, got, dates)
 				}
+			}
+			if len(data.MarkersJSON) == 0 {
+				t.Error("expected MarkersJSON to be non-empty")
+			}
+			if !strings.Contains(string(data.MarkersJSON), tc.wantMarkersJSON) {
+				t.Errorf("MarkersJSON does not contain %q: %s", tc.wantMarkersJSON, data.MarkersJSON)
 			}
 		})
 	}
