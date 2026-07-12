@@ -30,6 +30,10 @@ func (r *routeStore) SearchArtists(query string) []models.Artist {
 	return r.AllArtists()
 }
 
+func (r *routeStore) FilterArtists(query string, criteria store.FilterCriteria) []models.Artist {
+	return r.AllArtists()
+}
+
 func (r *routeStore) ArtistPageDataByID(id int) (models.ArtistPageData, bool) {
 	if id == 1 {
 		return models.ArtistPageData{
