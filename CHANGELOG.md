@@ -15,7 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Artist location markers generated at startup and attached to `ArtistPageData`
 - Concert map section on the artist detail page, rendered with Leaflet
 - Marker data marshalled to JSON and injected into the template for client-side map rendering
-- Progress logging during startup geocoding, so first-run delay is visible rather than silent
 - Pre-warmed `data/geocache.json` committed to the repository for instant first-run startup
 - Test coverage for `RealStore` marker/`MarkersJSON` attachment and handler marker rendering
 - Unit tests for `initMap` (`map.test.js`)
@@ -27,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added concurrency safety, parent directory creation, and wrapped errors to the geocoding `Cache`
 - Added a 10-second timeout to `RealGeocoder`'s HTTP client to prevent startup hanging indefinitely on an unresponsive request
 - Nil marker slices now marshal to `[]` instead of `null`
+- `search.js` no longer crashes under Node — `window`/`document` access guarded so `search.test.js` can `require()` it (pre-existing bug, unrelated to geolocalization)
 
 ### Changed
 - `RealGeocoder` godoc comments updated to reflect corrected `Geocode` behaviour
