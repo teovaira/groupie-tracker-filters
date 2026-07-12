@@ -23,4 +23,10 @@ type Store interface {
 	// pre-geocoded marker data needed to render the artist detail page, and true.
 	// Returns false if the ID does not match any artist.
 	ArtistPageDataByID(id int) (models.ArtistPageData, bool)
+	// FilterArtists returns all artists matching both the free-text query
+	// (same semantics as SearchArtists; an empty query matches everything)
+	// and the structured criteria (a zero-value FilterCriteria imposes no
+	// constraints). The two are combined with a logical AND, so passing both
+	// narrows the result further than either alone.
+	FilterArtists(query string, criteria FilterCriteria) []models.Artist
 }
