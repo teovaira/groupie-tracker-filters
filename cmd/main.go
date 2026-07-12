@@ -1,5 +1,6 @@
 // Package main is the entry point for the groupie-tracker web server.
-// It loads all artist data from the external API on startup, builds the
+// It loads all artist data from the external API on startup, geocodes each
+// concert location via Nominatim (using a disk-backed cache), builds the
 // in-memory store, registers all HTTP routes, and starts listening.
 package main
 
@@ -17,11 +18,10 @@ import (
 	"groupie-tracker-geolocalization/internal/store"
 )
 
-// addr is the TCP address the HTTP server listens on.
 const (
-	addr         = ":8080"
-	geocoderURL  = "https://nominatim.openstreetmap.org/search"
-	geoCachePath = "data/geocache.json"
+	addr         = ":8080"                                    // TCP address the HTTP server listens on.
+	geocoderURL  = "https://nominatim.openstreetmap.org/search" // Nominatim geocoding endpoint.
+	geoCachePath = "data/geocache.json"                        // Path to the disk-backed geocoding cache.
 )
 
 // main loads all data from the external API, wires up the dependency graph
