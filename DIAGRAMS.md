@@ -16,8 +16,7 @@ flowchart TD
     D --> H[store.SearchArtists]
 
     F --> I[(RealStore)]
-    G --> I
-    H --> I
+    G -->|ArtistPageData incl. MarkersJSON| I
 
     I -->|loaded once at startup| J[api.LoadData]
     J -->|fetch| K([groupietrackers API])
@@ -37,7 +36,7 @@ flowchart TD
     L -->|extends| N[base.html]
     M -->|extends| N
 
-    M -->|MarkersJSON| X[map.js + Leaflet]
+    M -->|embeds MarkersJSON, loads| X[map.js + Leaflet]
 ```
 
 ## Startup Lifecycle — Geocoding
