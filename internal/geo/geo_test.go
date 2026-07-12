@@ -53,7 +53,7 @@ func TestRealGeocoder_BadJSON(t *testing.T) {
 
 func TestRealGeocoder_QueryParams(t *testing.T) {
 	g, close := newTestGeocoder(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Query().Get("q") != "paris-france" {
+		if r.URL.Query().Get("q") != "paris, france" {
 			t.Errorf("unexpected q param: %s", r.URL.Query().Get("q"))
 		}
 		if r.URL.Query().Get("format") != "json" {
@@ -64,6 +64,24 @@ func TestRealGeocoder_QueryParams(t *testing.T) {
 	defer close()
 
 	g.Geocode("paris-france")
+}
+
+func TestNormalizeLocation(t *testing.T) {
+	tests := []struct {
+		input string
+		want  string
+	}{
+		{"paris-france", "paris, france"},
+		{"san_francisco-usa", "san francisco, usa"},
+		{"north_carolina-usa", "north carolina, usa"},
+		{"london-uk", "london, uk"},
+	}
+	for _, tc := range tests {
+		got := normalizeLocation(tc.input)
+		if got != tc.want {
+			t.Errorf("normalizeLocation(%q) = %q, want %q", tc.input, got, tc.want)
+		}
+	}
 }
 
 func TestRealGeocoder_ImplementsInterface(t *testing.T) {
