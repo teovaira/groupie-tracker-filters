@@ -6,6 +6,34 @@ import (
 	"testing"
 )
 
+func TestFirstAlbumYear(t *testing.T) {
+	tests := []struct {
+		name      string
+		firstAlbum string
+		wantYear  int
+		wantErr   bool
+	}{
+		{"valid_date", "14-12-1973", 1973, false},
+		{"valid_date_single_digit_day_month", "4-7-1995", 1995, false},
+		{"empty_string", "", 0, true},
+		{"missing_parts", "14-12", 0, true},
+		{"non_numeric_year", "14-12-abcd", 0, true},
+		{"extra_parts", "14-12-1973-extra", 0, true},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			year, err := firstAlbumYear(tc.firstAlbum)
+			if (err != nil) != tc.wantErr {
+				t.Fatalf("err = %v, wantErr %v", err, tc.wantErr)
+			}
+			if !tc.wantErr && year != tc.wantYear {
+				t.Errorf("year = %d, want %d", year, tc.wantYear)
+			}
+		})
+	}
+}
+
 func TestMockStore_AllArtists(t *testing.T) {
 	m := &MockStore{}
 	artists := m.AllArtists()
