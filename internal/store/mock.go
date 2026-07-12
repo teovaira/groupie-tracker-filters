@@ -2,6 +2,7 @@ package store
 
 import (
 	"groupie-tracker/internal/models"
+	"html/template"
 )
 
 // MockStore is a test implementation of the Store interface.
@@ -51,6 +52,8 @@ func (m *MockStore) ArtistPageDataByID(id int) (models.ArtistPageData, bool) {
 				Locations:      []string{},
 				Dates:          []string{},
 				DatesLocations: map[string][]string{},
+				Markers:        []models.Marker{},
+				MarkersJSON:    template.JS("[]"),
 			}, true
 		}
 	}

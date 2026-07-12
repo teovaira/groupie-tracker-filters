@@ -1,7 +1,9 @@
 package store
 
 import (
+	"encoding/json"
 	"groupie-tracker/internal/models"
+	"html/template"
 	"strconv"
 	"strings"
 )
@@ -94,13 +96,16 @@ func (r *RealStore) ArtistPageDataByID(id int) (models.ArtistPageData, bool) {
 				}
 			}
 			markers := r.Markers[id]
-
+			markersJSON, err := json.Marshal(markers)
+			if err != nil {
+				markersJSON = []byte("[]")
+			}
 			return models.ArtistPageData{
 				Artist:         a,
 				Locations:      locations,
 				Dates:          dates,
 				DatesLocations: datesLocations,
-				Markers:        markers,
+				MarkersJSON:    template.JS(markersJSON),
 			}, true
 		}
 	}
