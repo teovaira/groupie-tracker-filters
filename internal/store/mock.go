@@ -42,6 +42,21 @@ func (m *MockStore) SearchArtists(query string) []models.Artist {
 	return results
 }
 
+// FilterArtists filters the hardcoded artist list by query using the same
+// matchesQuery function as SearchArtists. Structured criteria matching is
+// added in a later change; until then, criteria is accepted but not yet
+// applied, so passing a zero-value FilterCriteria alongside an empty query
+// returns every fixture artist.
+func (m *MockStore) FilterArtists(query string, criteria FilterCriteria) []models.Artist {
+	var results []models.Artist
+	for _, a := range m.AllArtists() {
+		if matchesQuery(a, query) {
+			results = append(results, a)
+		}
+	}
+	return results
+}
+
 // ArtistPageDataByID returns an ArtistPageData for the matching fixture artist
 // with empty locations, dates, datesLocations, markers, and MarkersJSON,
 // since the mock holds no concert or geocoding data.
