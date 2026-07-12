@@ -18,7 +18,7 @@ lint:
 	golangci-lint run
 
 build:
-	go build -o bin/groupie-tracker ./cmd
+	go build -o bin/groupie-tracker-geolocalization ./cmd
 
 test:
 	go test -v ./...
