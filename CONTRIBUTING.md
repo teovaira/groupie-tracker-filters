@@ -26,15 +26,14 @@ Example: `feat(handlers): implement GET /artist/{id} handler`
 ## Tests
 
 - Go: table-driven tests, one `_test.go` per package
-- JS: unit tests in `search.test.js`
+- JS: unit tests colocated with the file under test (e.g. `search.test.js`, `map.test.js`)
 - Run: `make test`
 
 ## Code Style
 
-- Go: follow standard conventions (`gofmt`, exported names PascalCase, errors lowercase)
-- Only standard library packages — no external dependencies
+- Go: follow standard conventions (`gofmt`, exported names PascalCase, errors lowercase); only standard library packages — no external Go dependencies (audited requirement)
+- Frontend: vanilla JS/CSS, except Leaflet (loaded via CDN, not a Go package) for map rendering
 - Functions under 50 lines
-- Frontend: vanilla JS/CSS, except Leaflet (loaded via CDN) for map rendering
 
 ## Package Ownership
 
