@@ -3,10 +3,11 @@ package models
 import "html/template"
 
 // ArtistPageData is the view model passed to the artist detail template.
-// It combines the core Artist data with the resolved concert data from all four
+// It combines the core Artist data with the resolved concert data from the
 // API endpoints. DatesLocations is sourced from the relations endpoint and maps
 // each concert location to the dates the artist performed there.
-// Markers holds the pre-geocoded coordinates for each concert location,
+// Markers holds the pre-geocoded coordinates for each concert location and
+// MarkersJSON is its JSON-encoded form, safe for direct embedding in templates,
 // used to render the map on the artist detail page.
 type ArtistPageData struct {
 	Artist         Artist

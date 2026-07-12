@@ -1,8 +1,8 @@
 // Package store defines the Store interface and provides two implementations:
-// RealStore, which holds data loaded from the external API at startup, and
-// MockStore, which returns hardcoded data for use in tests. All HTTP handlers
-// depend on the Store interface rather than a concrete type, keeping them
-// decoupled from the data source and easy to test in isolation.
+// RealStore, which holds data loaded from the external API and pre-geocoded
+// markers at startup, and MockStore, which returns hardcoded data for use in
+// tests. All HTTP handlers depend on the Store interface rather than a concrete
+// type, keeping them decoupled from the data source and easy to test in isolation.
 package store
 
 import "groupie-tracker-geolocalization/internal/models"
@@ -19,8 +19,8 @@ type Store interface {
 	// SearchArtists returns all artists whose name, members, creation date, or
 	// first album contain the given query string (case-insensitive).
 	SearchArtists(query string) []models.Artist
-	// ArtistPageDataByID returns the combined artist, locations, and dates data
-	// needed to render the artist detail page, and true. Returns false if the ID
-	// does not match any artist.
+	// ArtistPageDataByID returns the combined artist, locations, dates, and
+	// pre-geocoded marker data needed to render the artist detail page, and true.
+	// Returns false if the ID does not match any artist.
 	ArtistPageDataByID(id int) (models.ArtistPageData, bool)
 }

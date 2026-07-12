@@ -26,9 +26,10 @@ func NewArtistHandler(s store.Store, tmpl *template.Template, notFoundTmpl *temp
 }
 
 // ServeHTTP extracts the artist ID from the URL path, validates it is a positive
-// integer, and retrieves the matching ArtistPageData from the store. It renders
-// the result into a buffer before writing to the response so that a template
-// execution error does not result in a partially written 200 response.
+// integer, and retrieves the matching ArtistPageData from the store, which includes
+// pre-geocoded markers serialised as MarkersJSON. It renders the result into a buffer
+// before writing to the response so that a template execution error does not result
+// in a partially written 200 response.
 // Returns a styled 404 page for non-numeric or unknown IDs, 500 if template execution fails.
 func (h *ArtistHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	idStr := r.PathValue("id")

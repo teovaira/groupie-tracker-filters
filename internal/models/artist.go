@@ -1,7 +1,7 @@
 // Package models defines the data structures used throughout the application.
 // Each type maps directly to the JSON shape returned by the Groupie Trackers API,
 // with struct tags used for decoding. These types are shared across the api,
-// store, and handlers packages and should not contain any business logic.
+// geo, store, and handlers packages and should not contain any business logic.
 package models
 
 // Artist represents a single music artist or band as returned by the /api/artists endpoint.
