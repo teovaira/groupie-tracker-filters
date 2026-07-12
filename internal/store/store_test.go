@@ -34,6 +34,30 @@ func TestFirstAlbumYear(t *testing.T) {
 	}
 }
 
+func TestFilterCriteria_ZeroValueHasNoConstraints(t *testing.T) {
+	var c FilterCriteria
+	if c.CreationDateMin != nil || c.CreationDateMax != nil {
+		t.Error("expected zero-value FilterCriteria to have nil CreationDate bounds")
+	}
+	if c.FirstAlbumMin != nil || c.FirstAlbumMax != nil {
+		t.Error("expected zero-value FilterCriteria to have nil FirstAlbum bounds")
+	}
+	if c.MembersMin != nil || c.MembersMax != nil {
+		t.Error("expected zero-value FilterCriteria to have nil Members bounds")
+	}
+	if c.Locations != nil {
+		t.Error("expected zero-value FilterCriteria to have nil Locations")
+	}
+}
+
+func TestMockStore_FilterArtists_NoConstraintsReturnsAll(t *testing.T) {
+	m := &MockStore{}
+	got := m.FilterArtists("", FilterCriteria{})
+	if len(got) != len(m.AllArtists()) {
+		t.Errorf("expected all %d artists, got %d", len(m.AllArtists()), len(got))
+	}
+}
+
 func TestMockStore_AllArtists(t *testing.T) {
 	m := &MockStore{}
 	artists := m.AllArtists()
