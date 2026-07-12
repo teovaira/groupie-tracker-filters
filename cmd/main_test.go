@@ -6,9 +6,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"groupie-tracker/internal/handlers"
-	"groupie-tracker/internal/models"
-	"groupie-tracker/internal/store"
+	"groupie-tracker-geolocalization/internal/handlers"
+	"groupie-tracker-geolocalization/internal/models"
+	"groupie-tracker-geolocalization/internal/store"
 )
 
 type routeStore struct{}

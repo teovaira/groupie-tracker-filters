@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
-	"groupie-tracker/internal/store"
+	"groupie-tracker-geolocalization/internal/store"
 	"html/template"
 	"net/http"
 	"strings"

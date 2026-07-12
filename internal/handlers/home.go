@@ -9,7 +9,7 @@ import (
 	"html/template"
 	"net/http"
 
-	"groupie-tracker/internal/store"
+	"groupie-tracker-geolocalization/internal/store"
 )
 
 // HomeHandler handles GET / requests by rendering the artist list page.

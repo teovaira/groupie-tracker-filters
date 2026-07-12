@@ -1,7 +1,7 @@
 package store
 
 import (
-	"groupie-tracker/internal/models"
+	"groupie-tracker-geolocalization/internal/models"
 	"html/template"
 )
 

@@ -10,11 +10,11 @@ import (
 	"net/http"
 	"time"
 
-	"groupie-tracker/internal/api"
-	"groupie-tracker/internal/geo"
-	"groupie-tracker/internal/handlers"
-	"groupie-tracker/internal/models"
-	"groupie-tracker/internal/store"
+	"groupie-tracker-geolocalization/internal/api"
+	"groupie-tracker-geolocalization/internal/geo"
+	"groupie-tracker-geolocalization/internal/handlers"
+	"groupie-tracker-geolocalization/internal/models"
+	"groupie-tracker-geolocalization/internal/store"
 )
 
 // addr is the TCP address the HTTP server listens on.

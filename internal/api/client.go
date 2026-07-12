@@ -9,7 +9,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"groupie-tracker/internal/models"
+	"groupie-tracker-geolocalization/internal/models"
 	"net/http"
 	"time"
 )
