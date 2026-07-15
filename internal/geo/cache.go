@@ -34,7 +34,7 @@ func NewCache(path string) (*Cache, error) {
 		}
 		return nil, fmt.Errorf("open cache file: %w", err)
 	}
-	defer file.Close()
+	defer file.Close() //nolint:errcheck // deferred close, error unrecoverable
 
 	if err := json.NewDecoder(file).Decode(&c.data); err != nil {
 		return nil, fmt.Errorf("decode cache file: %w", err)
@@ -74,7 +74,7 @@ func (c *Cache) Save() error {
 	if err != nil {
 		return fmt.Errorf("create cache file: %w", err)
 	}
-	defer file.Close()
+	defer file.Close() //nolint:errcheck // deferred close, error unrecoverable
 
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
