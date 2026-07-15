@@ -337,6 +337,8 @@ func filterFixtureStore() *RealStore {
 			{ID: 8, Name: "Twenty One Pilots", Members: []string{"a", "b"}, CreationDate: 2009, FirstAlbum: "05-12-2009"},
 			{ID: 9, Name: "The Rolling Stones", Members: []string{"a", "b", "c", "d"}, CreationDate: 1962, FirstAlbum: "01-01-1964"},
 			{ID: 10, Name: "Metallica", Members: []string{"a", "b", "c", "d"}, CreationDate: 1981, FirstAlbum: "22-08-1987"},
+			{ID: 11, Name: "Post Malone", Members: []string{"a"}, CreationDate: 2013, FirstAlbum: "09-12-2016"},
+			{ID: 12, Name: "Early Debut Band", Members: []string{"a", "b"}, CreationDate: 2012, FirstAlbum: "01-01-2009"},
 		},
 		Locations: models.LocationsResponse{
 			Index: []models.Locations{
@@ -401,9 +403,17 @@ func TestRealStore_FilterArtists(t *testing.T) {
 			wantNames: []string{"Red Hot Chili Peppers", "Metallica"},
 		},
 		{
+			name: "creation_after_2010_and_first_album_after_2010",
+			criteria: FilterCriteria{
+				CreationDateMin: intPtr(2011),
+				FirstAlbumMin:   intPtr(2011),
+			},
+			wantNames: []string{"Post Malone"},
+		},
+		{
 			name:      "no_constraints_returns_all",
 			criteria:  FilterCriteria{},
-			wantNames: []string{"SOJA", "Pearl Jam", "Red Hot Chili Peppers", "Pink Floyd", "Foo Fighters", "Bobby McFerrins", "Eminem", "Twenty One Pilots", "The Rolling Stones", "Metallica"},
+			wantNames: []string{"SOJA", "Pearl Jam", "Red Hot Chili Peppers", "Pink Floyd", "Foo Fighters", "Bobby McFerrins", "Eminem", "Twenty One Pilots", "The Rolling Stones", "Metallica", "Post Malone", "Early Debut Band"},
 		},
 	}
 
