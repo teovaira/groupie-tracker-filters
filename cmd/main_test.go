@@ -34,6 +34,10 @@ func (r *routeStore) FilterArtists(query string, criteria store.FilterCriteria) 
 	return r.AllArtists()
 }
 
+func (r *routeStore) LocationGroups() []models.LocationGroup {
+	return nil
+}
+
 func (r *routeStore) ArtistPageDataByID(id int) (models.ArtistPageData, bool) {
 	if id == 1 {
 		return models.ArtistPageData{
