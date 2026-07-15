@@ -52,7 +52,7 @@ func (g *RealGeocoder) Geocode(address string) (Coordinates, error) {
 	if err != nil {
 		return Coordinates{}, err
 	}
-	req.Header.Set("User-Agent", "groupie-tracker-geolocalization")
+	req.Header.Set("User-Agent", "groupie-tracker-filters")
 	resp, err := g.Client.Do(req)
 	if err != nil {
 		return Coordinates{}, err
