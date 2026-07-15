@@ -68,6 +68,8 @@ func buildMux(s store.Store) *http.ServeMux {
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir("../web/static"))))
 	searchHandler := &handlers.SearchHandler{Store: s, BadRequestTmpl: badRequestTmpl}
 	mux.HandleFunc("GET /api/search", searchHandler.Search)
+	filterHandler := &handlers.FilterHandler{Store: s, BadRequestTmpl: badRequestTmpl}
+	mux.HandleFunc("GET /api/filter", filterHandler.Filter)
 	return mux
 }
 
