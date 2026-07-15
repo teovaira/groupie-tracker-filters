@@ -17,3 +17,23 @@ type ArtistPageData struct {
 	Markers        []Marker
 	MarkersJSON    template.JS
 }
+
+// LocationGroup collects every concert location slug that shares a common
+// country, for rendering as a labelled group of checkboxes in the location
+// filter. Country is a human-readable label derived from the slug's country
+// segment (e.g. "New Zealand" from "new_zealand"); Locations holds the raw,
+// unmodified slugs used as filter values (e.g. "auckland-new_zealand").
+type LocationGroup struct {
+	Country   string
+	Locations []string
+}
+
+// HomePageData is the view model passed to the home page template.
+// Artists is the full or filtered artist list rendered as cards; LocationGroups
+// is the complete, country-grouped vocabulary of concert locations available
+// across all artists, used to populate the location checkbox filter — it does
+// not change based on which artists are currently displayed.
+type HomePageData struct {
+	Artists        []Artist
+	LocationGroups []LocationGroup
+}
