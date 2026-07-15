@@ -157,6 +157,60 @@ Search artists by name, member, location, or creation year.
 
 ---
 
+## GET /api/filter
+
+Filter artists by free-text query and structured range/checkbox criteria.
+All parameters are optional; a request with none returns every artist.
+
+**Query Parameters**
+
+| Parameter          | Type     | Required | Description                                              |
+|---------------------|----------|----------|------------------------------------------------------------|
+| `q`                 | `string` | no       | Free-text search, same semantics as `/api/search`         |
+| `creation_min`      | `int`    | no       | Minimum `creationDate` (inclusive)                        |
+| `creation_max`      | `int`    | no       | Maximum `creationDate` (inclusive)                        |
+| `first_album_min`   | `int`    | no       | Minimum `firstAlbum` release year (inclusive)              |
+| `first_album_max`   | `int`    | no       | Maximum `firstAlbum` release year (inclusive)              |
+| `members_min`       | `int`    | no       | Minimum number of band members (inclusive)                 |
+| `members_max`       | `int`    | no       | Maximum number of band members (inclusive)                 |
+| `locations`         | `string` | no       | Concert location slug; repeat for multiple (logical OR)    |
+
+**Response** `200 OK`
+```json
+[
+  {
+    "id": 1,
+    "name": "Queen",
+    "image": "https://groupietrackers.herokuapp.com/api/images/queen.jpeg",
+    "members": ["Freddie Mercury", "Brian May", "Roger Taylor", "John Deacon"],
+    "creationDate": 1970,
+    "firstAlbum": "14-12-1973",
+    "locations": "https://groupietrackers.herokuapp.com/api/locations/1",
+    "concertDates": "https://groupietrackers.herokuapp.com/api/dates/1",
+    "relations": "https://groupietrackers.herokuapp.com/api/relation/1"
+  }
+]
+```
+
+Response fields match the `Artist` shape documented under `GET /artists` above.
+
+**Status Codes**
+
+| Code | Meaning                                          |
+|------|---------------------------------------------------|
+| 200  | Success — results or empty array                  |
+| 400  | A numeric parameter was present but not a valid integer |
+| 405  | Method not allowed — GET only                      |
+| 500  | Internal server error                              |
+
+**Notes**
+- All parameters combine with a logical AND — passing both `q` and range/checkbox criteria narrows the result further than either alone
+- `locations` matching is substring-based, not exact — a value like `washington-usa` also matches a more specific artist location such as `seattle-washington-usa`
+- Returns empty array `[]` when no artists match — never `null`
+- Every parameter is optional; a request with no parameters at all returns every artist
+
+---
+
 ## External: Nominatim Geocoding
 
 Base URL: `https://nominatim.openstreetmap.org/search`
