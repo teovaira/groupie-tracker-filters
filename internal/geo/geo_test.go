@@ -14,7 +14,7 @@ func newTestGeocoder(handler http.HandlerFunc) (*RealGeocoder, func()) {
 
 func TestRealGeocoder_Success(t *testing.T) {
 	g, close := newTestGeocoder(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`[{"lat":"51.5074","lon":"-0.1278"}]`))
+		w.Write([]byte(`[{"lat":"51.5074","lon":"-0.1278"}]`)) //nolint:errcheck // test fixture response write, error unrecoverable
 	})
 	defer close()
 
@@ -29,7 +29,7 @@ func TestRealGeocoder_Success(t *testing.T) {
 
 func TestRealGeocoder_EmptyResults(t *testing.T) {
 	g, close := newTestGeocoder(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`[]`))
+		w.Write([]byte(`[]`)) //nolint:errcheck // test fixture response write, error unrecoverable
 	})
 	defer close()
 
@@ -41,7 +41,7 @@ func TestRealGeocoder_EmptyResults(t *testing.T) {
 
 func TestRealGeocoder_BadJSON(t *testing.T) {
 	g, close := newTestGeocoder(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`not json`))
+		w.Write([]byte(`not json`)) //nolint:errcheck // test fixture response write, error unrecoverable
 	})
 	defer close()
 
@@ -59,11 +59,13 @@ func TestRealGeocoder_QueryParams(t *testing.T) {
 		if r.URL.Query().Get("format") != "json" {
 			t.Errorf("unexpected format param: %s", r.URL.Query().Get("format"))
 		}
-		w.Write([]byte(`[{"lat":"48.8566","lon":"2.3522"}]`))
+		w.Write([]byte(`[{"lat":"48.8566","lon":"2.3522"}]`)) //nolint:errcheck // test fixture response write, error unrecoverable
 	})
 	defer close()
 
-	g.Geocode("paris-france")
+	// Return values are unused — this test only asserts on the query
+	// parameters the handler above receives, not the geocode result.
+	_, _ = g.Geocode("paris-france")
 }
 
 func TestNormalizeLocation(t *testing.T) {
