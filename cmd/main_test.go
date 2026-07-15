@@ -91,6 +91,8 @@ func TestRoutes(t *testing.T) {
 		{"unknown_route_returns_404", http.MethodGet, "/nonexistent", http.StatusNotFound},
 		{"search_with_query_returns_200", http.MethodGet, "/api/search?q=test", http.StatusOK},
 		{"search_missing_q_returns_400", http.MethodGet, "/api/search", http.StatusBadRequest},
+		{"filter_no_params_returns_200", http.MethodGet, "/api/filter", http.StatusOK},
+		{"filter_malformed_param_returns_400", http.MethodGet, "/api/filter?members_min=abc", http.StatusBadRequest},
 	}
 
 	for _, tc := range tests {
