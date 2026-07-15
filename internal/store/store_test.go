@@ -442,3 +442,80 @@ func TestRealStore_FilterArtists_StableOrder(t *testing.T) {
 		}
 	}
 }
+
+func TestRealStore_LocationGroups(t *testing.T) {
+	s := &RealStore{
+		Locations: models.LocationsResponse{
+			Index: []models.Locations{
+				{ID: 1, Locations: []string{"texas-usa", "washington-usa"}},
+				{ID: 2, Locations: []string{"london-uk", "california-usa"}},
+				{ID: 3, Locations: []string{"auckland-new_zealand"}},
+			},
+		},
+	}
+
+	groups := s.LocationGroups()
+
+	byCountry := make(map[string][]string, len(groups))
+	for _, g := range groups {
+		byCountry[g.Country] = g.Locations
+	}
+
+	if len(groups) != 3 {
+		t.Fatalf("got %d groups, want 3", len(groups))
+	}
+
+	usa, ok := byCountry["Usa"]
+	if !ok {
+		t.Fatal("expected a Usa group")
+	}
+	wantUSA := []string{"california-usa", "texas-usa", "washington-usa"}
+	if len(usa) != len(wantUSA) {
+		t.Fatalf("Usa locations = %v, want %v", usa, wantUSA)
+	}
+	for i, loc := range wantUSA {
+		if usa[i] != loc {
+			t.Errorf("Usa[%d] = %q, want %q", i, usa[i], loc)
+		}
+	}
+
+	uk, ok := byCountry["Uk"]
+	if !ok || len(uk) != 1 || uk[0] != "london-uk" {
+		t.Errorf("Uk group = %v, want [london-uk]", uk)
+	}
+
+	nz, ok := byCountry["New Zealand"]
+	if !ok || len(nz) != 1 || nz[0] != "auckland-new_zealand" {
+		t.Errorf("New Zealand group = %v, want [auckland-new_zealand]", nz)
+	}
+}
+
+func TestRealStore_LocationGroups_SortedByCountry(t *testing.T) {
+	s := &RealStore{
+		Locations: models.LocationsResponse{
+			Index: []models.Locations{
+				{ID: 1, Locations: []string{"paris-france", "tokyo-japan", "london-uk"}},
+			},
+		},
+	}
+
+	groups := s.LocationGroups()
+
+	wantOrder := []string{"France", "Japan", "Uk"}
+	if len(groups) != len(wantOrder) {
+		t.Fatalf("got %d groups, want %d", len(groups), len(wantOrder))
+	}
+	for i, country := range wantOrder {
+		if groups[i].Country != country {
+			t.Errorf("groups[%d].Country = %q, want %q", i, groups[i].Country, country)
+		}
+	}
+}
+
+func TestMockStore_LocationGroups_ReturnsEmpty(t *testing.T) {
+	m := &MockStore{}
+	groups := m.LocationGroups()
+	if len(groups) != 0 {
+		t.Errorf("expected no location groups from MockStore, got %v", groups)
+	}
+}
