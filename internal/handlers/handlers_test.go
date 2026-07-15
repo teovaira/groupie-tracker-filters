@@ -12,7 +12,8 @@ import (
 )
 
 type testStore struct {
-	artists []models.Artist
+	artists        []models.Artist
+	locationGroups []models.LocationGroup
 }
 
 func (s *testStore) AllArtists() []models.Artist {
@@ -37,7 +38,7 @@ func (s *testStore) FilterArtists(query string, criteria store.FilterCriteria) [
 }
 
 func (s *testStore) LocationGroups() []models.LocationGroup {
-	return nil
+	return s.locationGroups
 }
 
 func (s *testStore) ArtistPageDataByID(id int) (models.ArtistPageData, bool) {
@@ -75,7 +76,7 @@ func TestHomeHandler(t *testing.T) {
 		{ID: 2, Name: "Queen", Image: "http://img/2.jpg", CreationDate: 1970},
 	}
 
-	homeTmpl := mustParseTemplate(`{{range .}}{{.Name}}{{end}}`)
+	homeTmpl := mustParseTemplate(`{{range .Artists}}{{.Name}}{{end}}`)
 
 	tests := []struct {
 		name             string
@@ -140,6 +141,28 @@ func TestHomeHandler(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestHomeHandler_PassesLocationGroupsToTemplate(t *testing.T) {
+	s := &testStore{
+		locationGroups: []models.LocationGroup{
+			{Country: "Usa", Locations: []string{"texas-usa"}},
+		},
+	}
+	tmpl := mustParseTemplate(`{{range .LocationGroups}}{{.Country}}{{end}}`)
+	h := NewHomeHandler(s, tmpl)
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+
+	h.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
+	if !strings.Contains(rec.Body.String(), "Usa") {
+		t.Errorf("body does not contain %q\nbody: %s", "Usa", rec.Body.String())
 	}
 }
 
