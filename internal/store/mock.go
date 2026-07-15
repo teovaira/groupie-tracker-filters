@@ -42,15 +42,16 @@ func (m *MockStore) SearchArtists(query string) []models.Artist {
 	return results
 }
 
-// FilterArtists filters the hardcoded artist list by query using the same
-// matchesQuery function as SearchArtists. Structured criteria matching is
-// added in a later change; until then, criteria is accepted but not yet
-// applied, so passing a zero-value FilterCriteria alongside an empty query
-// returns every fixture artist.
+// FilterArtists filters the hardcoded artist list by query and criteria using
+// the same matchesQuery and matchesCriteria logic as RealStore. The fixture
+// artists carry no location data, so any non-empty criteria.Locations never
+// matches. Filtering runs sequentially rather than through a worker pool —
+// unlike RealStore, the fixture set is tiny and tests benefit more from
+// straightforward, deterministic execution than from concurrency.
 func (m *MockStore) FilterArtists(query string, criteria FilterCriteria) []models.Artist {
 	var results []models.Artist
 	for _, a := range m.AllArtists() {
-		if matchesQuery(a, query) {
+		if matchesQuery(a, query) && matchesCriteria(a, nil, criteria) {
 			results = append(results, a)
 		}
 	}
