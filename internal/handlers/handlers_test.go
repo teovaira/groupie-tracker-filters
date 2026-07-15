@@ -287,6 +287,113 @@ func TestSearchHandler(t *testing.T) {
 	}
 }
 
+func TestFilterHandler(t *testing.T) {
+	tests := []struct {
+		name           string
+		method         string
+		url            string
+		wantStatusCode int
+		wantInBody     string
+	}{
+		{
+			name:           "no_params_returns_all_artists",
+			method:         http.MethodGet,
+			url:            "/api/filter",
+			wantStatusCode: http.StatusOK,
+			wantInBody:     "Billie Eilish",
+		},
+		{
+			name:           "query_only_matches_subset",
+			method:         http.MethodGet,
+			url:            "/api/filter?q=billie",
+			wantStatusCode: http.StatusOK,
+			wantInBody:     "Billie Eilish",
+		},
+		{
+			name:           "members_max_matches_zero_member_fixtures",
+			method:         http.MethodGet,
+			url:            "/api/filter?members_max=0",
+			wantStatusCode: http.StatusOK,
+			wantInBody:     "System of a down",
+		},
+		{
+			name:           "members_min_excludes_zero_member_fixtures",
+			method:         http.MethodGet,
+			url:            "/api/filter?members_min=1",
+			wantStatusCode: http.StatusOK,
+			wantInBody:     "[]",
+		},
+		{
+			name:           "malformed_creation_min_returns_400",
+			method:         http.MethodGet,
+			url:            "/api/filter?creation_min=notanumber",
+			wantStatusCode: http.StatusBadRequest,
+		},
+		{
+			name:           "malformed_creation_max_returns_400",
+			method:         http.MethodGet,
+			url:            "/api/filter?creation_max=abc",
+			wantStatusCode: http.StatusBadRequest,
+		},
+		{
+			name:           "malformed_first_album_min_returns_400",
+			method:         http.MethodGet,
+			url:            "/api/filter?first_album_min=xyz",
+			wantStatusCode: http.StatusBadRequest,
+		},
+		{
+			name:           "malformed_first_album_max_returns_400",
+			method:         http.MethodGet,
+			url:            "/api/filter?first_album_max=xyz",
+			wantStatusCode: http.StatusBadRequest,
+		},
+		{
+			name:           "malformed_members_min_returns_400",
+			method:         http.MethodGet,
+			url:            "/api/filter?members_min=xyz",
+			wantStatusCode: http.StatusBadRequest,
+		},
+		{
+			name:           "malformed_members_max_returns_400",
+			method:         http.MethodGet,
+			url:            "/api/filter?members_max=xyz",
+			wantStatusCode: http.StatusBadRequest,
+		},
+		{
+			name:           "locations_param_matches_nothing_in_mock_store",
+			method:         http.MethodGet,
+			url:            "/api/filter?locations=texas-usa",
+			wantStatusCode: http.StatusOK,
+			wantInBody:     "[]",
+		},
+		{
+			name:           "post_method_returns_405",
+			method:         http.MethodPost,
+			url:            "/api/filter",
+			wantStatusCode: http.StatusMethodNotAllowed,
+		},
+	}
+
+	badReqTmpl := template.Must(template.New("400.html").Parse(`Bad Request`))
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			h := &FilterHandler{Store: &store.MockStore{}, BadRequestTmpl: badReqTmpl}
+			req := httptest.NewRequest(tc.method, tc.url, nil)
+			rec := httptest.NewRecorder()
+
+			h.Filter(rec, req)
+
+			if rec.Code != tc.wantStatusCode {
+				t.Errorf("status = %d, want %d", rec.Code, tc.wantStatusCode)
+			}
+			if tc.wantInBody != "" && !strings.Contains(rec.Body.String(), tc.wantInBody) {
+				t.Errorf("body does not contain %q\nbody: %s", tc.wantInBody, rec.Body.String())
+			}
+		})
+	}
+}
+
 func TestRecoveryMiddleware(t *testing.T) {
 	errTmpl := template.Must(template.New("500.html").Parse(`Internal Server Error`))
 
