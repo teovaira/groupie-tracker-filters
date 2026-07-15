@@ -298,3 +298,122 @@ func TestRealStore_SearchArtists(t *testing.T) {
 		})
 	}
 }
+
+func filterFixtureStore() *RealStore {
+	return &RealStore{
+		Artists: []models.Artist{
+			{ID: 1, Name: "SOJA", Members: []string{"a", "b", "c", "d", "e", "f", "g", "h"}, CreationDate: 1997, FirstAlbum: "01-01-2002"},
+			{ID: 2, Name: "Pearl Jam", Members: []string{"a", "b", "c", "d", "e"}, CreationDate: 1990, FirstAlbum: "03-07-1992"},
+			{ID: 3, Name: "Red Hot Chili Peppers", Members: []string{"a", "b", "c", "d"}, CreationDate: 1982, FirstAlbum: "10-02-1990"},
+			{ID: 4, Name: "Pink Floyd", Members: []string{"a", "b", "c", "d", "e", "f"}, CreationDate: 1965, FirstAlbum: "05-08-1967"},
+			{ID: 5, Name: "Foo Fighters", Members: []string{"a", "b", "c", "d", "e", "f"}, CreationDate: 1994, FirstAlbum: "04-07-1995"},
+			{ID: 6, Name: "Bobby McFerrins", Members: []string{"a"}, CreationDate: 1977, FirstAlbum: "01-01-1979"},
+			{ID: 7, Name: "Eminem", Members: []string{"a"}, CreationDate: 1996, FirstAlbum: "12-11-1996"},
+			{ID: 8, Name: "Twenty One Pilots", Members: []string{"a", "b"}, CreationDate: 2009, FirstAlbum: "05-12-2009"},
+			{ID: 9, Name: "The Rolling Stones", Members: []string{"a", "b", "c", "d"}, CreationDate: 1962, FirstAlbum: "01-01-1964"},
+			{ID: 10, Name: "Metallica", Members: []string{"a", "b", "c", "d"}, CreationDate: 1981, FirstAlbum: "22-08-1987"},
+		},
+		Locations: models.LocationsResponse{
+			Index: []models.Locations{
+				{ID: 8, Locations: []string{"texas-usa", "oklahoma-usa"}},
+				{ID: 9, Locations: []string{"washington-usa", "california-usa"}},
+			},
+		},
+	}
+}
+
+func TestRealStore_FilterArtists(t *testing.T) {
+	s := filterFixtureStore()
+
+	tests := []struct {
+		name      string
+		query     string
+		criteria  FilterCriteria
+		wantNames []string
+	}{
+		{
+			name:      "creation_date_range_only",
+			criteria:  FilterCriteria{CreationDateMin: intPtr(1995), CreationDateMax: intPtr(2000)},
+			wantNames: []string{"SOJA", "Eminem"},
+		},
+		{
+			name:      "first_album_range_only",
+			criteria:  FilterCriteria{FirstAlbumMin: intPtr(1990), FirstAlbumMax: intPtr(1992)},
+			wantNames: []string{"Pearl Jam", "Red Hot Chili Peppers"},
+		},
+		{
+			name:      "exact_member_count",
+			criteria:  FilterCriteria{MembersMin: intPtr(6), MembersMax: intPtr(6)},
+			wantNames: []string{"Pink Floyd", "Foo Fighters"},
+		},
+		{
+			name:      "location_only",
+			criteria:  FilterCriteria{Locations: []string{"texas-usa"}},
+			wantNames: []string{"Twenty One Pilots"},
+		},
+		{
+			name: "creation_date_range_and_solo_artist",
+			criteria: FilterCriteria{
+				CreationDateMin: intPtr(1970), CreationDateMax: intPtr(2000),
+				MembersMin: intPtr(1), MembersMax: intPtr(1),
+			},
+			wantNames: []string{"Bobby McFerrins", "Eminem"},
+		},
+		{
+			name: "location_and_members_above",
+			criteria: FilterCriteria{
+				Locations:  []string{"washington-usa"},
+				MembersMin: intPtr(4),
+			},
+			wantNames: []string{"The Rolling Stones"},
+		},
+		{
+			name: "first_album_range_and_max_members",
+			criteria: FilterCriteria{
+				FirstAlbumMin: intPtr(1980), FirstAlbumMax: intPtr(1990),
+				MembersMax: intPtr(4),
+			},
+			wantNames: []string{"Red Hot Chili Peppers", "Metallica"},
+		},
+		{
+			name:      "no_constraints_returns_all",
+			criteria:  FilterCriteria{},
+			wantNames: []string{"SOJA", "Pearl Jam", "Red Hot Chili Peppers", "Pink Floyd", "Foo Fighters", "Bobby McFerrins", "Eminem", "Twenty One Pilots", "The Rolling Stones", "Metallica"},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			results := s.FilterArtists(tc.query, tc.criteria)
+			gotNames := make(map[string]bool, len(results))
+			for _, a := range results {
+				gotNames[a.Name] = true
+			}
+			if len(results) != len(tc.wantNames) {
+				t.Fatalf("got %d results (%v), want %d (%v)", len(results), gotNames, len(tc.wantNames), tc.wantNames)
+			}
+			for _, name := range tc.wantNames {
+				if !gotNames[name] {
+					t.Errorf("expected %q in results, got %v", name, results)
+				}
+			}
+		})
+	}
+}
+
+func TestRealStore_FilterArtists_StableOrder(t *testing.T) {
+	s := filterFixtureStore()
+
+	first := s.FilterArtists("", FilterCriteria{})
+	for i := 0; i < 20; i++ {
+		got := s.FilterArtists("", FilterCriteria{})
+		if len(got) != len(first) {
+			t.Fatalf("run %d: got %d results, want %d", i, len(got), len(first))
+		}
+		for j := range first {
+			if got[j].ID != first[j].ID {
+				t.Fatalf("run %d: order mismatch at index %d: got ID %d, want ID %d", i, j, got[j].ID, first[j].ID)
+			}
+		}
+	}
+}
