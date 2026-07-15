@@ -8,10 +8,10 @@ import (
 
 func TestFirstAlbumYear(t *testing.T) {
 	tests := []struct {
-		name      string
+		name       string
 		firstAlbum string
-		wantYear  int
-		wantErr   bool
+		wantYear   int
+		wantErr    bool
 	}{
 		{"valid_date", "14-12-1973", 1973, false},
 		{"valid_date_single_digit_day_month", "4-7-1995", 1995, false},

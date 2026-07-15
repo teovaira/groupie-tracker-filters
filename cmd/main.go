@@ -19,9 +19,9 @@ import (
 )
 
 const (
-	addr         = ":8080"                                    // TCP address the HTTP server listens on.
+	addr         = ":8080"                                      // TCP address the HTTP server listens on.
 	geocoderURL  = "https://nominatim.openstreetmap.org/search" // Nominatim geocoding endpoint.
-	geoCachePath = "data/geocache.json"                        // Path to the disk-backed geocoding cache.
+	geoCachePath = "data/geocache.json"                         // Path to the disk-backed geocoding cache.
 )
 
 // main loads all data from the external API, wires up the dependency graph
