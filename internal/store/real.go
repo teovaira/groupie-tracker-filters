@@ -2,7 +2,7 @@ package store
 
 import (
 	"encoding/json"
-	"groupie-tracker-geolocalization/internal/models"
+	"groupie-tracker-filters/internal/models"
 	"html/template"
 	"strconv"
 	"strings"
