@@ -5,7 +5,7 @@
 // type, keeping them decoupled from the data source and easy to test in isolation.
 package store
 
-import "groupie-tracker-geolocalization/internal/models"
+import "groupie-tracker-filters/internal/models"
 
 // Store is the data access interface used by all HTTP handlers.
 // It abstracts over the underlying data source so that handlers can be tested
