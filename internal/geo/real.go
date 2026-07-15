@@ -57,7 +57,7 @@ func (g *RealGeocoder) Geocode(address string) (Coordinates, error) {
 	if err != nil {
 		return Coordinates{}, err
 	}
-	defer resp.Body.Close()
+	defer resp.Body.Close() //nolint:errcheck // deferred close, error unrecoverable
 
 	if resp.StatusCode != http.StatusOK {
 		return Coordinates{}, fmt.Errorf("geocoding request for %q failed: status %d %s", address, resp.StatusCode, resp.Status)
