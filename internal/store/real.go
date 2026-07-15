@@ -218,12 +218,7 @@ func matchesQuery(a models.Artist, query string) bool {
 func (r *RealStore) ArtistPageDataByID(id int) (models.ArtistPageData, bool) {
 	for _, a := range r.AllArtists() {
 		if a.ID == id {
-			var locations []string
-			for _, l := range r.Locations.Index {
-				if l.ID == id {
-					locations = l.Locations
-				}
-			}
+			locations := r.locationsForArtist(id)
 			var dates []string
 			for _, d := range r.Dates.Index {
 				if d.ID == id {
