@@ -58,6 +58,31 @@ func TestMockStore_FilterArtists_NoConstraintsReturnsAll(t *testing.T) {
 	}
 }
 
+func TestMockStore_FilterArtists_AppliesCriteria(t *testing.T) {
+	m := &MockStore{}
+
+	tests := []struct {
+		name     string
+		query    string
+		criteria FilterCriteria
+		wantLen  int
+	}{
+		{"members_min_excludes_zero_member_fixtures", "", FilterCriteria{MembersMin: intPtr(1)}, 0},
+		{"members_max_zero_matches_fixtures", "", FilterCriteria{MembersMax: intPtr(0)}, 2},
+		{"location_constraint_matches_nothing", "", FilterCriteria{Locations: []string{"texas-usa"}}, 0},
+		{"query_and_criteria_combined", "billie", FilterCriteria{MembersMax: intPtr(0)}, 1},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := m.FilterArtists(tc.query, tc.criteria)
+			if len(got) != tc.wantLen {
+				t.Errorf("got %d results, want %d", len(got), tc.wantLen)
+			}
+		})
+	}
+}
+
 func intPtr(v int) *int { return &v }
 
 func TestMatchesCriteria(t *testing.T) {
