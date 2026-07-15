@@ -8,10 +8,13 @@
    5. Header
    6. Footer
    7. Search
-   8. Artist Grid
-   9. Artist Card
-   10. Loading & States
-   11. Responsive
+   8. Filter Panel
+   9. Artist Grid
+   10. Artist Card
+   11. Loading & States
+   12. Artist Detail Page
+   13. Responsive
+   14. Error Pages
    ============================================================ */
 
 
@@ -244,7 +247,154 @@ footer p {
 
 
 /* ============================================================
-   8. ARTIST GRID
+   8. FILTER PANEL
+   ============================================================ */
+
+.filter-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-2xl);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+.filter-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.filter-panel-header h2 {
+    color: var(--color-text);
+}
+
+.filter-reset {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--color-text-muted);
+    padding: var(--space-xs) var(--space-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    transition: color var(--transition), border-color var(--transition);
+}
+
+.filter-reset:hover {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+/* Range filters — creation date, first album, member count */
+.filter-range-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-lg);
+}
+
+.filter-range {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    background-color: var(--color-surface-2);
+    border: none;
+    border-radius: var(--radius-sm);
+    flex: 1 1 200px;
+}
+
+.filter-range legend {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    padding: 0 0 var(--space-sm);
+}
+
+.filter-range label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+}
+
+.filter-range-input {
+    width: 100px;
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--font-size-sm);
+    font-family: var(--font);
+    color: var(--color-text);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    outline: none;
+    transition: border-color var(--transition);
+}
+
+.filter-range-input:focus {
+    border-color: var(--color-primary);
+}
+
+/* Location checkboxes — collapsible, grouped by country */
+.filter-locations {
+    border: none;
+    padding: 0;
+}
+
+.filter-locations legend {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    padding-bottom: var(--space-sm);
+}
+
+.filter-locations-groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--space-sm);
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.filter-location-group {
+    background-color: var(--color-surface-2);
+    border-radius: var(--radius-sm);
+    padding: var(--space-sm) var(--space-md);
+}
+
+.filter-location-group summary {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+.filter-location-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    margin-top: var(--space-sm);
+}
+
+.filter-location-checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: color var(--transition);
+}
+
+.filter-location-checkbox:hover {
+    color: var(--color-text);
+}
+
+
+/* ============================================================
+   9. ARTIST GRID
    ============================================================ */
 
 .artist-grid {
@@ -255,7 +405,7 @@ footer p {
 
 
 /* ============================================================
-   9. ARTIST CARD
+   10. ARTIST CARD
    ============================================================ */
 
 .artist-card {
@@ -303,7 +453,7 @@ footer p {
 
 
 /* ============================================================
-   10. LOADING & STATES
+   11. LOADING & STATES
    ============================================================ */
 
 .hidden {
@@ -338,7 +488,7 @@ footer p {
 
 
 /* ============================================================
-   11. ARTIST DETAIL PAGE
+   12. ARTIST DETAIL PAGE
    ============================================================ */
 
 .back-link {
@@ -538,7 +688,7 @@ footer p {
 
 
 /* ============================================================
-   12. RESPONSIVE
+   13. RESPONSIVE
    ============================================================ */
 
 /* Tablet — 768px and up */
@@ -584,7 +734,7 @@ footer p {
 
 
 /* ============================================================
-   13. ERROR PAGES
+   14. ERROR PAGES
    ============================================================ */
 
 .error-page {
