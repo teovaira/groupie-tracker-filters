@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"groupie-tracker-geolocalization/internal/store"
+	"groupie-tracker-filters/internal/store"
 )
 
 // ArtistHandler handles GET /artist/{id} requests by looking up a single artist
