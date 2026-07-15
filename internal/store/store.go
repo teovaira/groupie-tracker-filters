@@ -29,4 +29,8 @@ type Store interface {
 	// constraints). The two are combined with a logical AND, so passing both
 	// narrows the result further than either alone.
 	FilterArtists(query string, criteria FilterCriteria) []models.Artist
+	// LocationGroups returns the complete vocabulary of concert locations
+	// across all artists, grouped by country, for populating the location
+	// checkbox filter. The result does not depend on any filter state.
+	LocationGroups() []models.LocationGroup
 }
