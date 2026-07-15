@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"groupie-tracker-geolocalization/internal/models"
-	"groupie-tracker-geolocalization/internal/store"
+	"groupie-tracker-filters/internal/models"
+	"groupie-tracker-filters/internal/store"
 )
 
 type testStore struct {
