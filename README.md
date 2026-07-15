@@ -13,15 +13,15 @@ Built with Go (standard library only) and plain HTML/CSS/JS, using Leaflet for m
 **Prerequisites:** Go 1.22+
 
 ```bash
-git clone https://github.com/vxanthio/groupie-tracker-geolocalization.git
-cd groupie-tracker-geolocalization
+git clone https://github.com/teovaira/groupie-tracker-filters.git
+cd groupie-tracker-filters
 
 # run directly (no build step)
 go run ./cmd
 
 # or build a binary first
 make build
-./bin/groupie-tracker-geolocalization
+./bin/groupie-tracker-filters
 ```
 
 Visit `http://localhost:8080`
