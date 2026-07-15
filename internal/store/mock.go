@@ -58,6 +58,13 @@ func (m *MockStore) FilterArtists(query string, criteria FilterCriteria) []model
 	return results
 }
 
+// LocationGroups returns no groups, since the fixture artists carry no
+// location data. Tests that need a non-empty location filter vocabulary
+// should exercise RealStore directly instead.
+func (m *MockStore) LocationGroups() []models.LocationGroup {
+	return []models.LocationGroup{}
+}
+
 // ArtistPageDataByID returns an ArtistPageData for the matching fixture artist
 // with empty locations, dates, datesLocations, markers, and MarkersJSON,
 // since the mock holds no concert or geocoding data.
