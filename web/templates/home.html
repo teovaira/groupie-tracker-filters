@@ -14,6 +14,74 @@
     >
 </section>
 
+<section class="filter-panel">
+    <div class="filter-panel-header">
+        <h2>Filters</h2>
+        <button type="button" id="filter-reset" class="filter-reset">Reset filters</button>
+    </div>
+
+    <div class="filter-range-group">
+        <fieldset class="filter-range">
+            <legend>Creation date</legend>
+            <label>
+                Min
+                <input type="number" id="filter-creation-min" class="filter-range-input" placeholder="e.g. 1970">
+            </label>
+            <label>
+                Max
+                <input type="number" id="filter-creation-max" class="filter-range-input" placeholder="e.g. 2000">
+            </label>
+        </fieldset>
+
+        <fieldset class="filter-range">
+            <legend>First album year</legend>
+            <label>
+                Min
+                <input type="number" id="filter-first-album-min" class="filter-range-input" placeholder="e.g. 1990">
+            </label>
+            <label>
+                Max
+                <input type="number" id="filter-first-album-max" class="filter-range-input" placeholder="e.g. 2000">
+            </label>
+        </fieldset>
+
+        <fieldset class="filter-range">
+            <legend>Number of members</legend>
+            <label>
+                Min
+                <input type="number" id="filter-members-min" class="filter-range-input" min="1" placeholder="e.g. 1">
+            </label>
+            <label>
+                Max
+                <input type="number" id="filter-members-max" class="filter-range-input" min="1" placeholder="e.g. 6">
+            </label>
+        </fieldset>
+    </div>
+
+    <fieldset class="filter-locations">
+        <legend>Concert locations</legend>
+        {{if .LocationGroups}}
+        <div id="filter-locations" class="filter-locations-groups">
+            {{range .LocationGroups}}
+            <details class="filter-location-group">
+                <summary>{{.Country}}</summary>
+                <div class="filter-location-checkboxes">
+                    {{range .Locations}}
+                    <label class="filter-location-checkbox">
+                        <input type="checkbox" name="locations" value="{{.}}">
+                        {{.}}
+                    </label>
+                    {{end}}
+                </div>
+            </details>
+            {{end}}
+        </div>
+        {{else}}
+        <p class="empty-state">No location data available.</p>
+        {{end}}
+    </fieldset>
+</section>
+
 <div id="loading" class="loading hidden">Searching...</div>
 
 <div id="no-results" class="no-results hidden">
@@ -21,7 +89,7 @@
 </div>
 
 <section id="search-results" class="artist-grid">
-    {{range .}}
+    {{range .Artists}}
     <a href="/artist/{{.ID}}" class="artist-card">
         <img src="{{.Image}}" alt="{{.Name}}">
         <div class="artist-card-info">
