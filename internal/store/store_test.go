@@ -58,6 +58,70 @@ func TestMockStore_FilterArtists_NoConstraintsReturnsAll(t *testing.T) {
 	}
 }
 
+func intPtr(v int) *int { return &v }
+
+func TestMatchesCriteria(t *testing.T) {
+	artist := models.Artist{
+		ID:           1,
+		Name:         "Foo Fighters",
+		Members:      []string{"Dave", "Nate", "Pat", "Chris", "Rami", "Josh"},
+		CreationDate: 1994,
+		FirstAlbum:   "04-07-1995",
+	}
+	artistLocations := []string{"texas-usa", "washington-usa"}
+
+	tests := []struct {
+		name      string
+		locations []string
+		criteria  FilterCriteria
+		want      bool
+	}{
+		{"zero_value_matches_everything", artistLocations, FilterCriteria{}, true},
+		{"creation_date_within_range", artistLocations, FilterCriteria{CreationDateMin: intPtr(1990), CreationDateMax: intPtr(2000)}, true},
+		{"creation_date_below_min", artistLocations, FilterCriteria{CreationDateMin: intPtr(1995)}, false},
+		{"creation_date_above_max", artistLocations, FilterCriteria{CreationDateMax: intPtr(1993)}, false},
+		{"first_album_within_range", artistLocations, FilterCriteria{FirstAlbumMin: intPtr(1990), FirstAlbumMax: intPtr(2000)}, true},
+		{"first_album_below_min", artistLocations, FilterCriteria{FirstAlbumMin: intPtr(1996)}, false},
+		{"first_album_above_max", artistLocations, FilterCriteria{FirstAlbumMax: intPtr(1994)}, false},
+		{"members_exact_match", artistLocations, FilterCriteria{MembersMin: intPtr(6), MembersMax: intPtr(6)}, true},
+		{"members_below_min", artistLocations, FilterCriteria{MembersMin: intPtr(7)}, false},
+		{"members_above_max", artistLocations, FilterCriteria{MembersMax: intPtr(5)}, false},
+		{"location_match", artistLocations, FilterCriteria{Locations: []string{"texas-usa"}}, true},
+		{"location_no_match", artistLocations, FilterCriteria{Locations: []string{"california-usa"}}, false},
+		{"location_match_any_of_multiple", artistLocations, FilterCriteria{Locations: []string{"california-usa", "washington-usa"}}, true},
+		{"location_constraint_no_locations_data", nil, FilterCriteria{Locations: []string{"texas-usa"}}, false},
+		{
+			"all_criteria_combined_match",
+			artistLocations,
+			FilterCriteria{
+				CreationDateMin: intPtr(1990), CreationDateMax: intPtr(2000),
+				FirstAlbumMin: intPtr(1990), FirstAlbumMax: intPtr(2000),
+				MembersMin: intPtr(6), MembersMax: intPtr(6),
+				Locations: []string{"texas-usa"},
+			},
+			true,
+		},
+		{
+			"all_criteria_combined_one_fails",
+			artistLocations,
+			FilterCriteria{
+				CreationDateMin: intPtr(1990), CreationDateMax: intPtr(2000),
+				MembersMin: intPtr(7),
+			},
+			false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := matchesCriteria(artist, tc.locations, tc.criteria)
+			if got != tc.want {
+				t.Errorf("matchesCriteria() = %v, want %v", got, tc.want)
+			}
+		})
+	}
+}
+
 func TestMockStore_AllArtists(t *testing.T) {
 	m := &MockStore{}
 	artists := m.AllArtists()
