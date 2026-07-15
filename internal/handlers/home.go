@@ -9,6 +9,7 @@ import (
 	"html/template"
 	"net/http"
 
+	"groupie-tracker-filters/internal/models"
 	"groupie-tracker-filters/internal/store"
 )
 
@@ -24,7 +25,10 @@ func NewHomeHandler(s store.Store, tmpl *template.Template) http.Handler {
 	return &HomeHandler{store: s, tmpl: tmpl}
 }
 
-// ServeHTTP retrieves all artists from the store and renders the home template.
+// ServeHTTP retrieves all artists and the location filter vocabulary from the
+// store and renders the home template with both. LocationGroups is always the
+// complete, unfiltered vocabulary — it seeds the filter panel's checkboxes and
+// does not depend on which artists are currently displayed.
 // Returns 500 if template execution fails — the page is never partially written.
 func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
@@ -32,10 +36,13 @@ func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	artists := h.store.AllArtists()
+	data := models.HomePageData{
+		Artists:        h.store.AllArtists(),
+		LocationGroups: h.store.LocationGroups(),
+	}
 
 	var buf bytes.Buffer
-	if err := h.tmpl.ExecuteTemplate(&buf, "base", artists); err != nil {
+	if err := h.tmpl.ExecuteTemplate(&buf, "base", data); err != nil {
 		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
