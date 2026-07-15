@@ -54,7 +54,7 @@ func (r *routeStore) ArtistPageDataByID(id int) (models.ArtistPageData, bool) {
 var _ store.Store = (*routeStore)(nil)
 
 func buildMux(s store.Store) *http.ServeMux {
-	homeTmpl := template.Must(template.New("base").Parse(`{{range .}}{{.Name}}{{end}}`))
+	homeTmpl := template.Must(template.New("base").Parse(`{{range .Artists}}{{.Name}}{{end}}`))
 	artistTmpl := template.Must(template.New("base").Parse(`{{.Artist.Name}}`))
 	errorTmpl := template.Must(template.New("404.html").Parse(`Not Found`))
 
