@@ -114,6 +114,7 @@ func TestMatchesCriteria(t *testing.T) {
 		{"location_match", artistLocations, FilterCriteria{Locations: []string{"texas-usa"}}, true},
 		{"location_no_match", artistLocations, FilterCriteria{Locations: []string{"california-usa"}}, false},
 		{"location_match_any_of_multiple", artistLocations, FilterCriteria{Locations: []string{"california-usa", "washington-usa"}}, true},
+		{"broad_filter_matches_more_specific_slug", []string{"seattle-washington-usa"}, FilterCriteria{Locations: []string{"washington-usa"}}, true},
 		{"location_constraint_no_locations_data", nil, FilterCriteria{Locations: []string{"texas-usa"}}, false},
 		{
 			"all_criteria_combined_match",
