@@ -36,6 +36,10 @@ func (s *testStore) FilterArtists(query string, criteria store.FilterCriteria) [
 	return s.artists
 }
 
+func (s *testStore) LocationGroups() []models.LocationGroup {
+	return nil
+}
+
 func (s *testStore) ArtistPageDataByID(id int) (models.ArtistPageData, bool) {
 	for _, a := range s.artists {
 		if a.ID == id {
