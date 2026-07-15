@@ -314,6 +314,22 @@ func TestSearchHandler(t *testing.T) {
 	}
 }
 
+func TestSearchHandler_NoMatchReturnsEmptyArray(t *testing.T) {
+	h := &SearchHandler{
+		Store:          &store.MockStore{},
+		BadRequestTmpl: template.Must(template.New("400.html").Parse(`Bad Request`)),
+	}
+	req := httptest.NewRequest(http.MethodGet, "/api/search?q=zzznomatchxyz", nil)
+	rec := httptest.NewRecorder()
+
+	h.Search(rec, req)
+
+	body := strings.TrimSpace(rec.Body.String())
+	if body != "[]" {
+		t.Errorf("body = %q, want %q", body, "[]")
+	}
+}
+
 func TestFilterHandler(t *testing.T) {
 	tests := []struct {
 		name           string
