@@ -1,10 +1,12 @@
-# Groupie Tracker Geolocalization
+# Groupie Tracker Geolocalization & Filters
 
-An extension of Groupie Tracker that geocodes each artist's concert locations and plots them on an interactive map.
+An extension of Groupie Tracker that geocodes each artist's concert locations onto an interactive map and lets users filter the artist list by creation date, first album date, number of members, and concert locations.
 
 ## About
 
-Groupie Tracker Geolocalization builds on the base project by resolving each concert location string (e.g. "san_francisco-usa") into real-world coordinates using the Nominatim geocoding service, then rendering them as markers on a per-artist map. Geocoded results are cached to disk so repeated runs don't re-query the geocoding service for locations already resolved.
+This project builds on the base Groupie Tracker in two ways. First, it resolves each concert location string (e.g. "san_francisco-usa") into real-world coordinates using the Nominatim geocoding service, then renders them as markers on a per-artist map. Geocoded results are cached to disk so repeated runs don't re-query the geocoding service for locations already resolved.
+
+Second, it lets users narrow the artist list with range filters (creation date, first album year, number of members) and a checkbox filter (concert locations, grouped by country), combined with the existing live search — all applied asynchronously, without a page reload.
 
 Built with Go (standard library only) and plain HTML/CSS/JS, using Leaflet for map rendering.
 
@@ -36,6 +38,11 @@ First run is instant — `data/geocache.json` ships pre-populated. If you delete
 - Disk-backed geocoding cache — avoids re-querying already-resolved locations across restarts
 - Rate-limited geocoding requests to respect the Nominatim usage policy
 - Graceful handling of unresolvable locations — a failed geocode is logged and skipped without breaking the rest of the map
+- Range filters for creation date, first album year, and number of members
+- Checkbox filter for concert locations, grouped by country
+- Filters combine with each other and with live search using logical AND
+- Filtering is fully asynchronous — results update as filters change, with no page reload
+- Filter matching runs across a goroutine worker pool for concurrent evaluation
 
 ## Project Structure
 
