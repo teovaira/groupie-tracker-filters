@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"groupie-tracker-filters/internal/models"
 	"groupie-tracker-filters/internal/store"
 	"html/template"
 	"net/http"
@@ -35,6 +36,12 @@ func (h *SearchHandler) Search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result := h.Store.SearchArtists(query)
+	// SearchArtists may return a nil slice when nothing matches, which encodes
+	// as JSON null; the API contract guarantees an empty array instead, so the
+	// frontend can always safely call .length on it.
+	if result == nil {
+		result = []models.Artist{}
+	}
 	w.Header().Set("Content-Type", "application/json")
 	err := json.NewEncoder(w).Encode(result)
 	if err != nil {
