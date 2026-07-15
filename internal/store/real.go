@@ -4,8 +4,11 @@ import (
 	"encoding/json"
 	"groupie-tracker-filters/internal/models"
 	"html/template"
+	"runtime"
+	"sort"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 // RealStore is the production implementation of the Store interface.
@@ -47,18 +50,82 @@ func (r *RealStore) SearchArtists(query string) []models.Artist {
 	return result
 }
 
-// FilterArtists filters the artist list by query using the same matchesQuery
-// function as SearchArtists. Structured criteria matching is added in a later
-// change; until then, criteria is accepted but not yet applied, so passing a
-// zero-value FilterCriteria alongside an empty query returns every artist.
+// filterMatch pairs a matching artist with its original index in AllArtists,
+// so concurrent workers in FilterArtists can report results out of order
+// and still let the caller restore a deterministic, input-order result.
+type filterMatch struct {
+	index  int
+	artist models.Artist
+}
+
+// FilterArtists returns all artists matching both query (via matchesQuery)
+// and criteria (via matchesCriteria), combined with a logical AND. Matching
+// is fanned out across a bounded pool of goroutines — one per available CPU —
+// since evaluating each artist is independent, read-only work over data that
+// never changes after startup. Workers report matches on a channel in
+// completion order, which is not guaranteed to match input order, so results
+// are sorted back into the original AllArtists order before returning —
+// this ordering step must not be removed, or repeated identical filter
+// requests could return artists in a different order on each call.
 func (r *RealStore) FilterArtists(query string, criteria FilterCriteria) []models.Artist {
-	var result []models.Artist
-	for _, a := range r.AllArtists() {
-		if matchesQuery(a, query) {
-			result = append(result, a)
+	artists := r.AllArtists()
+
+	jobs := make(chan int)
+	matches := make(chan filterMatch)
+
+	var wg sync.WaitGroup
+	workerCount := runtime.NumCPU()
+	if workerCount > len(artists) {
+		workerCount = len(artists)
+	}
+	for w := 0; w < workerCount; w++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for i := range jobs {
+				a := artists[i]
+				if matchesQuery(a, query) && matchesCriteria(a, r.locationsForArtist(a.ID), criteria) {
+					matches <- filterMatch{index: i, artist: a}
+				}
+			}
+		}()
+	}
+
+	go func() {
+		for i := range artists {
+			jobs <- i
+		}
+		close(jobs)
+	}()
+
+	go func() {
+		wg.Wait()
+		close(matches)
+	}()
+
+	var result []filterMatch
+	for m := range matches {
+		result = append(result, m)
+	}
+
+	sort.Slice(result, func(i, j int) bool { return result[i].index < result[j].index })
+
+	artistsResult := make([]models.Artist, len(result))
+	for i, m := range result {
+		artistsResult[i] = m.artist
+	}
+	return artistsResult
+}
+
+// locationsForArtist returns the concert location slugs for the artist with
+// the given ID, or nil if the artist has no entry in the Locations index.
+func (r *RealStore) locationsForArtist(id int) []string {
+	for _, l := range r.Locations.Index {
+		if l.ID == id {
+			return l.Locations
 		}
 	}
-	return result
+	return nil
 }
 
 // matchesQuery performs a case-insensitive substring search across the artist's
