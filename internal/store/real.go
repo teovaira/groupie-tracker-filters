@@ -117,6 +117,66 @@ func (r *RealStore) FilterArtists(query string, criteria FilterCriteria) []model
 	return artistsResult
 }
 
+// LocationGroups scans every artist's concert locations, groups the unique
+// slugs by their trailing country segment (e.g. "usa" from "texas-usa"),
+// and returns one LocationGroup per country. Locations within a group and
+// the groups themselves are both sorted alphabetically by country, so the
+// checkbox filter renders in a stable, predictable order across requests.
+func (r *RealStore) LocationGroups() []models.LocationGroup {
+	byCountry := make(map[string]map[string]struct{})
+
+	for _, entry := range r.Locations.Index {
+		for _, loc := range entry.Locations {
+			country := countrySlug(loc)
+			if byCountry[country] == nil {
+				byCountry[country] = make(map[string]struct{})
+			}
+			byCountry[country][loc] = struct{}{}
+		}
+	}
+
+	groups := make([]models.LocationGroup, 0, len(byCountry))
+	for country, locSet := range byCountry {
+		locs := make([]string, 0, len(locSet))
+		for loc := range locSet {
+			locs = append(locs, loc)
+		}
+		sort.Strings(locs)
+		groups = append(groups, models.LocationGroup{
+			Country:   titleCaseCountry(country),
+			Locations: locs,
+		})
+	}
+
+	sort.Slice(groups, func(i, j int) bool { return groups[i].Country < groups[j].Country })
+
+	return groups
+}
+
+// countrySlug extracts the country segment from a "city-country" location
+// slug — the substring after the last hyphen.
+func countrySlug(location string) string {
+	idx := strings.LastIndex(location, "-")
+	if idx == -1 {
+		return location
+	}
+	return location[idx+1:]
+}
+
+// titleCaseCountry converts a country slug (e.g. "new_zealand") into a
+// human-readable label (e.g. "New Zealand") by replacing underscores with
+// spaces and capitalising the first letter of each word.
+func titleCaseCountry(slug string) string {
+	words := strings.Split(slug, "_")
+	for i, w := range words {
+		if w == "" {
+			continue
+		}
+		words[i] = strings.ToUpper(w[:1]) + w[1:]
+	}
+	return strings.Join(words, " ")
+}
+
 // locationsForArtist returns the concert location slugs for the artist with
 // the given ID, or nil if the artist has no entry in the Locations index.
 func (r *RealStore) locationsForArtist(id int) []string {
