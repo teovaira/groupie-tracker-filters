@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-07-15
+
+### Added
+- `FilterCriteria` struct and `Store.FilterArtists(query, criteria)` for combined free-text and structured artist filtering
+- Range filters for creation date, first album year, and number of members
+- Checkbox filter for concert locations, grouped by country and matched with substring semantics (e.g. a `washington-usa` selection also matches a more specific `seattle-washington-usa` slug)
+- `Store.LocationGroups()` and `models.LocationGroup`/`models.HomePageData` to populate the location checkbox filter from the full, unfiltered location vocabulary
+- `GET /api/filter` endpoint, mirroring `/api/search`'s JSON contract, accepting `q`, `creation_min`/`creation_max`, `first_album_min`/`first_album_max`, `members_min`/`members_max`, and repeated `locations` query parameters — all optional, so no parameters returns every artist
+- Goroutine worker pool in `RealStore.FilterArtists`, fanning artist-predicate evaluation across `runtime.NumCPU()` workers, with results re-sorted back into deterministic input order after collection
+- Filter panel UI on the home page: range inputs plus collapsible, country-grouped location checkboxes
+- `filter.js` — debounced, asynchronous wiring of the filter panel and the existing search box to `/api/filter`, so search and filters combine live without a page reload
+- Filter panel styling matching the existing dark-theme design system
+- Full test coverage for the filtering feature: `matchesCriteria`, `RealStore`/`MockStore` `FilterArtists` and `LocationGroups`, `FilterHandler`, route wiring, and `filter.js`'s `buildFilterQuery`
+
+### Changed
+- Go module renamed from `groupie-tracker-geolocalization` to `groupie-tracker-filters`, along with the Nominatim `User-Agent` header, build binary name, and repository links, to match the new feature and repository
+- `HomeHandler` now passes `models.HomePageData{Artists, LocationGroups}` to the home template instead of a raw artist slice
+- `search.js` no longer self-initializes; `filter.js` now owns `#search-results` and reads the search box as part of the combined `/api/filter` request
+
+### Fixed
+- `FilterHandler` normalizes a nil `FilterArtists` result to an empty JSON array (`[]`) rather than `null`, matching `/api/search`'s existing contract
+
 ## [1.1.0] - 2026-07-12
 
 ### Added
@@ -62,5 +84,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Renamed `AppData.Date` → `Dates` for consistency
 - HTTP error strings lowercased to follow Go conventions
 
+[1.2.0]: https://github.com/teovaira/groupie-tracker-filters.git
 [1.1.0]: https://github.com/vxanthio/groupie-tracker-geolocalization.git
 [1.0.0]: https://github.com/vxanthio/groupie-tracker.git
