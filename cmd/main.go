@@ -119,6 +119,10 @@ func main() {
 		Store:          s,
 		BadRequestTmpl: badRequestTmpl,
 	}
+	filterHandler := &handlers.FilterHandler{
+		Store:          s,
+		BadRequestTmpl: badRequestTmpl,
+	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -131,6 +135,7 @@ func main() {
 	mux.Handle("GET /artist/{id}", artistHandler)
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
 	mux.HandleFunc("GET /api/search", searchHandler.Search)
+	mux.HandleFunc("GET /api/filter", filterHandler.Filter)
 
 	log.Printf("server listening on http://localhost%s", addr)
 
