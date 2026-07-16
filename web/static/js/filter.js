@@ -77,8 +77,6 @@ function rangeSlider(fieldset) {
     const minThumb  = fieldset.querySelector('.range-thumb--min');
     const maxThumb  = fieldset.querySelector('.range-thumb--max');
     const fill      = fieldset.querySelector('[data-fill]');
-    const labelMin  = fieldset.querySelector('[data-value-min]');
-    const labelMax  = fieldset.querySelector('[data-value-max]');
     const bubbleMin = fieldset.querySelector('[data-bubble-min]');
     const bubbleMax = fieldset.querySelector('[data-bubble-max]');
     const dataMin   = Number(minThumb.min);
@@ -115,8 +113,6 @@ function rangeSlider(fieldset) {
             bubbleMax.textContent = maxThumb.value;
             bubbleMax.style.left = right + '%';
         }
-        if (labelMin) { labelMin.textContent = minThumb.value; }
-        if (labelMax) { labelMax.textContent = maxThumb.value; }
 
         // When the min thumb is dragged past the midpoint it overlaps the max
         // thumb; raise the max thumb above it so it never becomes untappable.
