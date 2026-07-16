@@ -33,7 +33,7 @@ function assertEqual(actual, expected, msg) {
 // filter.js must export { buildFilterQuery } when run under Node.
 // ---------------------------------------------------------------------------
 
-const { buildFilterQuery } = require('./filter.js');
+const { buildFilterQuery, sliderRangeState } = require('./filter.js');
 
 // ---------------------------------------------------------------------------
 // buildFilterQuery tests
@@ -103,6 +103,38 @@ test('combines all fields in a stable order', () => {
         qs,
         'q=queen&creation_min=1970&creation_max=1980&first_album_min=1973&first_album_max=1980&members_min=4&members_max=4&locations=london-uk'
     );
+});
+
+console.log('\nsliderRangeState');
+
+test('omits both when slider is at full span', () => {
+    const s = sliderRangeState(1958, 2015, 1958, 2015);
+    assertEqual(s.min, '');
+    assertEqual(s.max, '');
+});
+
+test('sends min when min thumb is dragged inward', () => {
+    const s = sliderRangeState(1995, 2015, 1958, 2015);
+    assertEqual(s.min, '1995');
+    assertEqual(s.max, '');
+});
+
+test('sends max when max thumb is dragged inward', () => {
+    const s = sliderRangeState(1958, 2000, 1958, 2015);
+    assertEqual(s.min, '');
+    assertEqual(s.max, '2000');
+});
+
+test('sends both when both thumbs are inward', () => {
+    const s = sliderRangeState(1970, 2000, 1958, 2015);
+    assertEqual(s.min, '1970');
+    assertEqual(s.max, '2000');
+});
+
+test('handles a collapsed range where both thumbs meet inward', () => {
+    const s = sliderRangeState(6, 6, 1, 8);
+    assertEqual(s.min, '6');
+    assertEqual(s.max, '6');
 });
 
 // ---------------------------------------------------------------------------
