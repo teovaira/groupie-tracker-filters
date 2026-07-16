@@ -41,6 +41,10 @@ func (s *testStore) LocationGroups() []models.LocationGroup {
 	return s.locationGroups
 }
 
+func (s *testStore) FilterBounds() models.FilterBounds {
+	return models.FilterBounds{}
+}
+
 func (s *testStore) ArtistPageDataByID(id int) (models.ArtistPageData, bool) {
 	for _, a := range s.artists {
 		if a.ID == id {
