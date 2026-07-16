@@ -28,12 +28,27 @@ type LocationGroup struct {
 	Locations []string
 }
 
+// FilterBounds holds the minimum and maximum values for each range filter,
+// derived from the full artist dataset. These seed the endpoints of the
+// range sliders on the home page so that every slider position corresponds
+// to real data rather than empty space beyond the actual range.
+type FilterBounds struct {
+	CreationMin   int
+	CreationMax   int
+	FirstAlbumMin int
+	FirstAlbumMax int
+	MembersMin    int
+	MembersMax    int
+}
+
 // HomePageData is the view model passed to the home page template.
 // Artists is the full or filtered artist list rendered as cards; LocationGroups
 // is the complete, country-grouped vocabulary of concert locations available
-// across all artists, used to populate the location checkbox filter — it does
-// not change based on which artists are currently displayed.
+// across all artists, used to populate the location checkbox filter; Bounds
+// holds the min/max endpoints for the range sliders. None of these change
+// based on which artists are currently displayed.
 type HomePageData struct {
 	Artists        []Artist
 	LocationGroups []LocationGroup
+	Bounds         FilterBounds
 }
