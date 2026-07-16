@@ -25,10 +25,11 @@ func NewHomeHandler(s store.Store, tmpl *template.Template) http.Handler {
 	return &HomeHandler{store: s, tmpl: tmpl}
 }
 
-// ServeHTTP retrieves all artists and the location filter vocabulary from the
-// store and renders the home template with both. LocationGroups is always the
-// complete, unfiltered vocabulary — it seeds the filter panel's checkboxes and
-// does not depend on which artists are currently displayed.
+// ServeHTTP retrieves all artists, the location filter vocabulary, and the
+// range-slider bounds from the store and renders the home template with them.
+// LocationGroups and Bounds are always the complete, unfiltered values — they
+// seed the filter panel's checkboxes and sliders and do not depend on which
+// artists are currently displayed.
 // Returns 500 if template execution fails — the page is never partially written.
 func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
@@ -39,6 +40,7 @@ func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	data := models.HomePageData{
 		Artists:        h.store.AllArtists(),
 		LocationGroups: h.store.LocationGroups(),
+		Bounds:         h.store.FilterBounds(),
 	}
 
 	var buf bytes.Buffer
