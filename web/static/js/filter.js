@@ -74,13 +74,15 @@ if (typeof module !== 'undefined' && module.exports) {
 // keep the two thumbs from crossing, paint the filled segment, refresh the
 // value labels, and read the current min/max as query values.
 function rangeSlider(fieldset) {
-    const minThumb = fieldset.querySelector('.range-thumb--min');
-    const maxThumb = fieldset.querySelector('.range-thumb--max');
-    const fill     = fieldset.querySelector('[data-fill]');
-    const labelMin = fieldset.querySelector('[data-value-min]');
-    const labelMax = fieldset.querySelector('[data-value-max]');
-    const dataMin  = Number(minThumb.min);
-    const dataMax  = Number(maxThumb.max);
+    const minThumb  = fieldset.querySelector('.range-thumb--min');
+    const maxThumb  = fieldset.querySelector('.range-thumb--max');
+    const fill      = fieldset.querySelector('[data-fill]');
+    const labelMin  = fieldset.querySelector('[data-value-min]');
+    const labelMax  = fieldset.querySelector('[data-value-max]');
+    const bubbleMin = fieldset.querySelector('[data-bubble-min]');
+    const bubbleMax = fieldset.querySelector('[data-bubble-max]');
+    const dataMin   = Number(minThumb.min);
+    const dataMax   = Number(maxThumb.max);
 
     function clamp() {
         // Thumbs share a track; stop them from crossing so min never exceeds max.
@@ -91,16 +93,40 @@ function rangeSlider(fieldset) {
         }
     }
 
-    function paint() {
+    function percent(value) {
         const span = dataMax - dataMin || 1;
-        const left = ((Number(minThumb.value) - dataMin) / span) * 100;
-        const right = ((Number(maxThumb.value) - dataMin) / span) * 100;
+        return ((Number(value) - dataMin) / span) * 100;
+    }
+
+    function paint() {
+        const left = percent(minThumb.value);
+        const right = percent(maxThumb.value);
         if (fill) {
             fill.style.left = left + '%';
             fill.style.width = (right - left) + '%';
         }
+        // Bubbles ride above each thumb so the current value is visible under
+        // the finger while dragging; the head readout mirrors the same values.
+        if (bubbleMin) {
+            bubbleMin.textContent = minThumb.value;
+            bubbleMin.style.left = left + '%';
+        }
+        if (bubbleMax) {
+            bubbleMax.textContent = maxThumb.value;
+            bubbleMax.style.left = right + '%';
+        }
         if (labelMin) { labelMin.textContent = minThumb.value; }
         if (labelMax) { labelMax.textContent = maxThumb.value; }
+
+        // When the min thumb is dragged past the midpoint it overlaps the max
+        // thumb; raise the max thumb above it so it never becomes untappable.
+        if (left > 50) {
+            minThumb.style.zIndex = '3';
+            maxThumb.style.zIndex = '4';
+        } else {
+            minThumb.style.zIndex = '4';
+            maxThumb.style.zIndex = '3';
+        }
     }
 
     function refresh() {
