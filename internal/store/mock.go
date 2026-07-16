@@ -65,6 +65,13 @@ func (m *MockStore) LocationGroups() []models.LocationGroup {
 	return []models.LocationGroup{}
 }
 
+// FilterBounds returns a zero-value FilterBounds, since the fixture artists
+// carry no creation/first-album/member data worth deriving slider bounds from.
+// Tests that need real bounds should exercise RealStore directly instead.
+func (m *MockStore) FilterBounds() models.FilterBounds {
+	return models.FilterBounds{}
+}
+
 // ArtistPageDataByID returns an ArtistPageData for the matching fixture artist
 // with empty locations, dates, datesLocations, markers, and MarkersJSON,
 // since the mock holds no concert or geocoding data.
