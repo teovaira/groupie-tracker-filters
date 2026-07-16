@@ -530,3 +530,48 @@ func TestMockStore_LocationGroups_ReturnsEmpty(t *testing.T) {
 		t.Errorf("expected no location groups from MockStore, got %v", groups)
 	}
 }
+
+func TestRealStore_FilterBounds(t *testing.T) {
+	s := &RealStore{
+		Artists: []models.Artist{
+			{ID: 1, Members: []string{"a"}, CreationDate: 1970, FirstAlbum: "14-12-1973"},
+			{ID: 2, Members: []string{"a", "b", "c", "d", "e", "f"}, CreationDate: 1994, FirstAlbum: "04-07-1995"},
+			{ID: 3, Members: []string{"a", "b"}, CreationDate: 2013, FirstAlbum: "09-12-2016"},
+		},
+	}
+
+	b := s.FilterBounds()
+
+	if b.CreationMin != 1970 || b.CreationMax != 2013 {
+		t.Errorf("creation bounds = [%d, %d], want [1970, 2013]", b.CreationMin, b.CreationMax)
+	}
+	if b.FirstAlbumMin != 1973 || b.FirstAlbumMax != 2016 {
+		t.Errorf("first album bounds = [%d, %d], want [1973, 2016]", b.FirstAlbumMin, b.FirstAlbumMax)
+	}
+	if b.MembersMin != 1 || b.MembersMax != 6 {
+		t.Errorf("members bounds = [%d, %d], want [1, 6]", b.MembersMin, b.MembersMax)
+	}
+}
+
+func TestRealStore_FilterBounds_SkipsUnparseableFirstAlbum(t *testing.T) {
+	s := &RealStore{
+		Artists: []models.Artist{
+			{ID: 1, Members: []string{"a"}, CreationDate: 1980, FirstAlbum: "bad"},
+			{ID: 2, Members: []string{"a", "b"}, CreationDate: 1990, FirstAlbum: "01-01-2000"},
+		},
+	}
+
+	b := s.FilterBounds()
+
+	if b.FirstAlbumMin != 2000 || b.FirstAlbumMax != 2000 {
+		t.Errorf("first album bounds = [%d, %d], want [2000, 2000] (unparseable skipped)", b.FirstAlbumMin, b.FirstAlbumMax)
+	}
+}
+
+func TestMockStore_FilterBounds_ReturnsZeroValue(t *testing.T) {
+	m := &MockStore{}
+	b := m.FilterBounds()
+	if b != (models.FilterBounds{}) {
+		t.Errorf("expected zero-value FilterBounds from MockStore, got %+v", b)
+	}
+}
