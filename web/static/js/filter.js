@@ -41,12 +41,33 @@ function buildFilterQuery(state) {
     return parts.join('&');
 }
 
+/**
+ * sliderRangeState converts a dual-handle slider's current thumb positions
+ * into the min/max strings to send to /api/filter. A thumb resting at its
+ * data edge (min thumb at dataMin, max thumb at dataMax) imposes no real
+ * constraint, so that side is returned as '' and omitted from the query —
+ * leaving untouched sliders equivalent to "no filter".
+ *
+ * @param {number} minVal - current position of the min thumb
+ * @param {number} maxVal - current position of the max thumb
+ * @param {number} dataMin - the slider's lowest possible value
+ * @param {number} dataMax - the slider's highest possible value
+ * @returns {{min: string, max: string}} values to send, '' where at the edge
+ */
+function sliderRangeState(minVal, maxVal, dataMin, dataMax) {
+    return {
+        min: minVal > dataMin ? String(minVal) : '',
+        max: maxVal < dataMax ? String(maxVal) : '',
+    };
+}
+
 // Expose pure functions for filter.test.js to import under Node, and
 // globally in the browser where filter.test.js runs them directly.
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { buildFilterQuery };
+    module.exports = { buildFilterQuery, sliderRangeState };
 } else {
     window.buildFilterQuery = buildFilterQuery;
+    window.sliderRangeState = sliderRangeState;
 }
 
 // init wires the search box and filter panel inputs to the combined
