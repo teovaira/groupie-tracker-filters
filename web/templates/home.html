@@ -22,50 +22,71 @@
 
     <div class="filter-range-group">
         <fieldset class="filter-range" data-range="creation">
-            <legend>Creation date</legend>
+            <div class="range-head">
+                <legend>Creation date</legend>
+                <span class="range-readout"><span data-value-min>{{.Bounds.CreationMin}}</span> – <span data-value-max>{{.Bounds.CreationMax}}</span></span>
+            </div>
             <div class="range-slider">
                 <div class="range-track"></div>
                 <div class="range-fill" data-fill></div>
+                <output class="range-bubble" data-bubble-min>{{.Bounds.CreationMin}}</output>
+                <output class="range-bubble" data-bubble-max>{{.Bounds.CreationMax}}</output>
                 <input type="range" id="filter-creation-min" class="range-thumb range-thumb--min"
-                    min="{{.Bounds.CreationMin}}" max="{{.Bounds.CreationMax}}" value="{{.Bounds.CreationMin}}">
+                    min="{{.Bounds.CreationMin}}" max="{{.Bounds.CreationMax}}" value="{{.Bounds.CreationMin}}"
+                    aria-label="Minimum creation date">
                 <input type="range" id="filter-creation-max" class="range-thumb range-thumb--max"
-                    min="{{.Bounds.CreationMin}}" max="{{.Bounds.CreationMax}}" value="{{.Bounds.CreationMax}}">
+                    min="{{.Bounds.CreationMin}}" max="{{.Bounds.CreationMax}}" value="{{.Bounds.CreationMax}}"
+                    aria-label="Maximum creation date">
             </div>
-            <div class="range-values">
-                <span data-value-min>{{.Bounds.CreationMin}}</span>
-                <span data-value-max>{{.Bounds.CreationMax}}</span>
+            <div class="range-ends">
+                <span>{{.Bounds.CreationMin}}</span>
+                <span>{{.Bounds.CreationMax}}</span>
             </div>
         </fieldset>
 
         <fieldset class="filter-range" data-range="first-album">
-            <legend>First album year</legend>
+            <div class="range-head">
+                <legend>First album year</legend>
+                <span class="range-readout"><span data-value-min>{{.Bounds.FirstAlbumMin}}</span> – <span data-value-max>{{.Bounds.FirstAlbumMax}}</span></span>
+            </div>
             <div class="range-slider">
                 <div class="range-track"></div>
                 <div class="range-fill" data-fill></div>
+                <output class="range-bubble" data-bubble-min>{{.Bounds.FirstAlbumMin}}</output>
+                <output class="range-bubble" data-bubble-max>{{.Bounds.FirstAlbumMax}}</output>
                 <input type="range" id="filter-first-album-min" class="range-thumb range-thumb--min"
-                    min="{{.Bounds.FirstAlbumMin}}" max="{{.Bounds.FirstAlbumMax}}" value="{{.Bounds.FirstAlbumMin}}">
+                    min="{{.Bounds.FirstAlbumMin}}" max="{{.Bounds.FirstAlbumMax}}" value="{{.Bounds.FirstAlbumMin}}"
+                    aria-label="Minimum first album year">
                 <input type="range" id="filter-first-album-max" class="range-thumb range-thumb--max"
-                    min="{{.Bounds.FirstAlbumMin}}" max="{{.Bounds.FirstAlbumMax}}" value="{{.Bounds.FirstAlbumMax}}">
+                    min="{{.Bounds.FirstAlbumMin}}" max="{{.Bounds.FirstAlbumMax}}" value="{{.Bounds.FirstAlbumMax}}"
+                    aria-label="Maximum first album year">
             </div>
-            <div class="range-values">
-                <span data-value-min>{{.Bounds.FirstAlbumMin}}</span>
-                <span data-value-max>{{.Bounds.FirstAlbumMax}}</span>
+            <div class="range-ends">
+                <span>{{.Bounds.FirstAlbumMin}}</span>
+                <span>{{.Bounds.FirstAlbumMax}}</span>
             </div>
         </fieldset>
 
         <fieldset class="filter-range" data-range="members">
-            <legend>Number of members</legend>
+            <div class="range-head">
+                <legend>Number of members</legend>
+                <span class="range-readout"><span data-value-min>{{.Bounds.MembersMin}}</span> – <span data-value-max>{{.Bounds.MembersMax}}</span></span>
+            </div>
             <div class="range-slider">
                 <div class="range-track"></div>
                 <div class="range-fill" data-fill></div>
+                <output class="range-bubble" data-bubble-min>{{.Bounds.MembersMin}}</output>
+                <output class="range-bubble" data-bubble-max>{{.Bounds.MembersMax}}</output>
                 <input type="range" id="filter-members-min" class="range-thumb range-thumb--min"
-                    min="{{.Bounds.MembersMin}}" max="{{.Bounds.MembersMax}}" value="{{.Bounds.MembersMin}}">
+                    min="{{.Bounds.MembersMin}}" max="{{.Bounds.MembersMax}}" value="{{.Bounds.MembersMin}}"
+                    aria-label="Minimum number of members">
                 <input type="range" id="filter-members-max" class="range-thumb range-thumb--max"
-                    min="{{.Bounds.MembersMin}}" max="{{.Bounds.MembersMax}}" value="{{.Bounds.MembersMax}}">
+                    min="{{.Bounds.MembersMin}}" max="{{.Bounds.MembersMax}}" value="{{.Bounds.MembersMax}}"
+                    aria-label="Maximum number of members">
             </div>
-            <div class="range-values">
-                <span data-value-min>{{.Bounds.MembersMin}}</span>
-                <span data-value-max>{{.Bounds.MembersMax}}</span>
+            <div class="range-ends">
+                <span>{{.Bounds.MembersMin}}</span>
+                <span>{{.Bounds.MembersMax}}</span>
             </div>
         </fieldset>
     </div>
