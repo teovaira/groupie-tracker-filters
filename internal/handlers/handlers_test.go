@@ -14,6 +14,7 @@ import (
 type testStore struct {
 	artists        []models.Artist
 	locationGroups []models.LocationGroup
+	bounds         models.FilterBounds
 }
 
 func (s *testStore) AllArtists() []models.Artist {
@@ -42,7 +43,7 @@ func (s *testStore) LocationGroups() []models.LocationGroup {
 }
 
 func (s *testStore) FilterBounds() models.FilterBounds {
-	return models.FilterBounds{}
+	return s.bounds
 }
 
 func (s *testStore) ArtistPageDataByID(id int) (models.ArtistPageData, bool) {
@@ -167,6 +168,26 @@ func TestHomeHandler_PassesLocationGroupsToTemplate(t *testing.T) {
 	}
 	if !strings.Contains(rec.Body.String(), "Usa") {
 		t.Errorf("body does not contain %q\nbody: %s", "Usa", rec.Body.String())
+	}
+}
+
+func TestHomeHandler_PassesBoundsToTemplate(t *testing.T) {
+	s := &testStore{
+		bounds: models.FilterBounds{CreationMin: 1958, CreationMax: 2015},
+	}
+	tmpl := mustParseTemplate(`{{.Bounds.CreationMin}}-{{.Bounds.CreationMax}}`)
+	h := NewHomeHandler(s, tmpl)
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rec := httptest.NewRecorder()
+
+	h.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
+	}
+	if !strings.Contains(rec.Body.String(), "1958-2015") {
+		t.Errorf("body does not contain bounds %q\nbody: %s", "1958-2015", rec.Body.String())
 	}
 }
 
