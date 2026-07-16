@@ -153,6 +153,48 @@ func (r *RealStore) LocationGroups() []models.LocationGroup {
 	return groups
 }
 
+// FilterBounds scans every artist and returns the minimum and maximum
+// creation year, first-album year, and member count across the dataset,
+// used to seed the range slider endpoints. Artists whose FirstAlbum string
+// cannot be parsed are skipped for the first-album bounds only, so one
+// malformed date does not distort the slider range. Returns a zero-value
+// FilterBounds if there are no artists.
+func (r *RealStore) FilterBounds() models.FilterBounds {
+	artists := r.AllArtists()
+	if len(artists) == 0 {
+		return models.FilterBounds{}
+	}
+
+	var b models.FilterBounds
+	firstAlbumSeen := false
+
+	for i, a := range artists {
+		members := len(a.Members)
+
+		if i == 0 {
+			b.CreationMin, b.CreationMax = a.CreationDate, a.CreationDate
+			b.MembersMin, b.MembersMax = members, members
+		} else {
+			b.CreationMin = min(b.CreationMin, a.CreationDate)
+			b.CreationMax = max(b.CreationMax, a.CreationDate)
+			b.MembersMin = min(b.MembersMin, members)
+			b.MembersMax = max(b.MembersMax, members)
+		}
+
+		if year, err := firstAlbumYear(a.FirstAlbum); err == nil {
+			if !firstAlbumSeen {
+				b.FirstAlbumMin, b.FirstAlbumMax = year, year
+				firstAlbumSeen = true
+			} else {
+				b.FirstAlbumMin = min(b.FirstAlbumMin, year)
+				b.FirstAlbumMax = max(b.FirstAlbumMax, year)
+			}
+		}
+	}
+
+	return b
+}
+
 // countrySlug extracts the country segment from a "city-country" location
 // slug — the substring after the last hyphen.
 func countrySlug(location string) string {
