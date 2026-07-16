@@ -286,37 +286,53 @@ footer p {
     border-color: var(--color-primary);
 }
 
-/* Range filters — creation date, first album, member count */
+/* Range filters — creation date, first album, member count.
+   Three equal cards side by side on desktop, stacking on narrow screens. */
 .filter-range-group {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: var(--space-lg);
 }
 
 .filter-range {
     display: flex;
     flex-direction: column;
-    gap: var(--space-sm);
-    padding: var(--space-md);
+    padding: var(--space-lg) var(--space-md) var(--space-md);
     background-color: var(--color-surface-2);
     border: none;
     border-radius: var(--radius-sm);
-    flex: 1 1 200px;
+    min-width: 0;
 }
 
-.filter-range legend {
+.range-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.range-head legend {
     font-size: var(--font-size-sm);
     font-weight: 600;
     color: var(--color-text);
-    padding: 0 0 var(--space-sm);
+    padding: 0;
+}
+
+/* Live "min – max" summary of the current selection, shown in the header. */
+.range-readout {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-primary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
 }
 
 /* Dual-handle range slider: two <input type=range> overlaid on one track,
    with a filled segment painted between the thumbs by filter.js. */
 .range-slider {
     position: relative;
-    height: 28px;
-    margin-top: var(--space-sm);
+    height: 24px;
 }
 
 .range-track,
@@ -339,16 +355,35 @@ footer p {
     background-color: var(--color-primary);
 }
 
-/* Both thumbs stack on the same track. The tracks are transparent and
-   pointer-events are disabled on the input body so only the thumbs are
-   grabbable — otherwise the top input would swallow all clicks. */
+/* Value bubble that rides above each thumb, centred on it, so the current
+   value is readable under the finger while dragging. */
+.range-bubble {
+    position: absolute;
+    bottom: calc(100% + 2px);
+    transform: translateX(-50%);
+    padding: 1px 6px;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--color-bg);
+    background-color: var(--color-primary);
+    border-radius: var(--radius-sm);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+/* Both thumbs stack on the same track. The input bodies are click-through
+   (pointer-events: none) so only the thumbs are grabbable — otherwise the
+   top input would swallow all clicks meant for the one beneath it. */
 .range-thumb {
     position: absolute;
-    top: 0;
+    top: 50%;
     left: 0;
     width: 100%;
-    height: 28px;
+    height: 24px;
     margin: 0;
+    transform: translateY(-50%);
     background: none;
     pointer-events: none;
     -webkit-appearance: none;
@@ -358,40 +393,50 @@ footer p {
 .range-thumb::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background-color: var(--color-primary);
     border: 2px solid var(--color-bg);
-    cursor: pointer;
+    cursor: grab;
     pointer-events: auto;
+    transition: transform var(--transition);
 }
 
 .range-thumb::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background-color: var(--color-primary);
     border: 2px solid var(--color-bg);
-    cursor: pointer;
+    cursor: grab;
     pointer-events: auto;
+}
+
+.range-thumb::-webkit-slider-thumb:active {
+    cursor: grabbing;
+    transform: scale(1.15);
 }
 
 .range-thumb:focus {
     outline: none;
 }
 
-.range-thumb:focus::-webkit-slider-thumb {
-    box-shadow: 0 0 0 3px rgba(244, 143, 177, 0.3);
+.range-thumb:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px rgba(244, 143, 177, 0.35);
 }
 
-.range-values {
+.range-thumb:focus-visible::-moz-range-thumb {
+    box-shadow: 0 0 0 3px rgba(244, 143, 177, 0.35);
+}
+
+/* Static min/max endpoints of the track, so the user sees the full span. */
+.range-ends {
     display: flex;
     justify-content: space-between;
-    margin-top: var(--space-xs);
+    margin-top: var(--space-sm);
     font-size: var(--font-size-sm);
-    font-weight: 600;
-    color: var(--color-text);
+    color: var(--color-text-muted);
     font-variant-numeric: tabular-nums;
 }
 
@@ -408,18 +453,24 @@ footer p {
     padding-bottom: var(--space-sm);
 }
 
+/* CSS multi-column (not grid) so expanding one country's <details> only
+   pushes the items below it within the same column, instead of stretching
+   an entire grid row of unrelated countries. */
 .filter-locations-groups {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: var(--space-sm);
-    max-height: 320px;
+    column-width: 220px;
+    column-gap: var(--space-sm);
+    max-height: 340px;
     overflow-y: auto;
+    padding-right: var(--space-xs);
 }
 
 .filter-location-group {
     background-color: var(--color-surface-2);
     border-radius: var(--radius-sm);
     padding: var(--space-sm) var(--space-md);
+    margin-bottom: var(--space-sm);
+    /* Keep each country card whole — never split across two columns. */
+    break-inside: avoid;
 }
 
 .filter-location-group summary {
@@ -753,6 +804,11 @@ footer p {
 @media (min-width: 768px) {
     .artist-grid {
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+
+    /* Three range cards side by side once there's room; they stack below this. */
+    .filter-range-group {
+        grid-template-columns: repeat(3, 1fr);
     }
 
     .artist-hero {
