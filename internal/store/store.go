@@ -33,4 +33,7 @@ type Store interface {
 	// across all artists, grouped by country, for populating the location
 	// checkbox filter. The result does not depend on any filter state.
 	LocationGroups() []models.LocationGroup
+	// FilterBounds returns the min/max endpoints for each range filter,
+	// derived from the full artist dataset, used to seed the range sliders.
+	FilterBounds() models.FilterBounds
 }
