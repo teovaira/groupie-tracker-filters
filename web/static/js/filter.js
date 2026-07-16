@@ -70,27 +70,80 @@ if (typeof module !== 'undefined' && module.exports) {
     window.sliderRangeState = sliderRangeState;
 }
 
+// rangeSlider wraps a single dual-handle range fieldset, exposing helpers to
+// keep the two thumbs from crossing, paint the filled segment, refresh the
+// value labels, and read the current min/max as query values.
+function rangeSlider(fieldset) {
+    const minThumb = fieldset.querySelector('.range-thumb--min');
+    const maxThumb = fieldset.querySelector('.range-thumb--max');
+    const fill     = fieldset.querySelector('[data-fill]');
+    const labelMin = fieldset.querySelector('[data-value-min]');
+    const labelMax = fieldset.querySelector('[data-value-max]');
+    const dataMin  = Number(minThumb.min);
+    const dataMax  = Number(maxThumb.max);
+
+    function clamp() {
+        // Thumbs share a track; stop them from crossing so min never exceeds max.
+        if (Number(minThumb.value) > Number(maxThumb.value)) {
+            const mid = Math.min(Number(minThumb.value), Number(maxThumb.value));
+            minThumb.value = mid;
+            maxThumb.value = mid;
+        }
+    }
+
+    function paint() {
+        const span = dataMax - dataMin || 1;
+        const left = ((Number(minThumb.value) - dataMin) / span) * 100;
+        const right = ((Number(maxThumb.value) - dataMin) / span) * 100;
+        if (fill) {
+            fill.style.left = left + '%';
+            fill.style.width = (right - left) + '%';
+        }
+        if (labelMin) { labelMin.textContent = minThumb.value; }
+        if (labelMax) { labelMax.textContent = maxThumb.value; }
+    }
+
+    function refresh() {
+        clamp();
+        paint();
+    }
+
+    function state() {
+        return sliderRangeState(Number(minThumb.value), Number(maxThumb.value), dataMin, dataMax);
+    }
+
+    function reset() {
+        minThumb.value = dataMin;
+        maxThumb.value = dataMax;
+        paint();
+    }
+
+    return { minThumb, maxThumb, refresh, state, reset };
+}
+
 // init wires the search box and filter panel inputs to the combined
 // /api/filter endpoint. It replaces search.js's own request handling — the
 // search box's input event is read here too, so search and filters combine
 // into a single request rather than each overwriting the other's results.
 function init() {
-    const searchInput    = document.getElementById('search-input');
-    const loading        = document.getElementById('loading');
-    const noResults      = document.getElementById('no-results');
-    const results        = document.getElementById('search-results');
-    const resetButton    = document.getElementById('filter-reset');
-    const creationMin    = document.getElementById('filter-creation-min');
-    const creationMax    = document.getElementById('filter-creation-max');
-    const firstAlbumMin  = document.getElementById('filter-first-album-min');
-    const firstAlbumMax  = document.getElementById('filter-first-album-max');
-    const membersMin     = document.getElementById('filter-members-min');
-    const membersMax     = document.getElementById('filter-members-max');
-    const locationsRoot  = document.getElementById('filter-locations');
+    const searchInput   = document.getElementById('search-input');
+    const loading       = document.getElementById('loading');
+    const noResults     = document.getElementById('no-results');
+    const results       = document.getElementById('search-results');
+    const resetButton   = document.getElementById('filter-reset');
+    const locationsRoot = document.getElementById('filter-locations');
 
     if (!searchInput || !loading || !noResults || !results) {
         return;
     }
+
+    const sliders = {};
+    document.querySelectorAll('.filter-range[data-range]').forEach(function (fs) {
+        sliders[fs.getAttribute('data-range')] = rangeSlider(fs);
+    });
+
+    // Paint the initial fill/labels so the sliders reflect their starting span.
+    Object.keys(sliders).forEach(function (k) { sliders[k].refresh(); });
 
     // Save the original server-rendered cards to restore when every filter is cleared.
     const originalHTML = results.innerHTML;
@@ -113,14 +166,17 @@ function init() {
     }
 
     function currentState() {
+        const creation = sliders['creation'] ? sliders['creation'].state() : { min: '', max: '' };
+        const album = sliders['first-album'] ? sliders['first-album'].state() : { min: '', max: '' };
+        const members = sliders['members'] ? sliders['members'].state() : { min: '', max: '' };
         return {
             q: searchInput.value,
-            creationMin: creationMin ? creationMin.value : '',
-            creationMax: creationMax ? creationMax.value : '',
-            firstAlbumMin: firstAlbumMin ? firstAlbumMin.value : '',
-            firstAlbumMax: firstAlbumMax ? firstAlbumMax.value : '',
-            membersMin: membersMin ? membersMin.value : '',
-            membersMax: membersMax ? membersMax.value : '',
+            creationMin: creation.min,
+            creationMax: creation.max,
+            firstAlbumMin: album.min,
+            firstAlbumMax: album.max,
+            membersMin: members.min,
+            membersMax: members.max,
             locations: checkedLocations(),
         };
     }
@@ -158,11 +214,20 @@ function init() {
 
     const debouncedChange = debounce(handleChange, 300);
 
+    // Repaint the slider fill immediately on every drag (snappy visual), but
+    // debounce the actual network request so dragging doesn't spam /api/filter.
+    function onSliderInput(slider) {
+        return function () {
+            slider.refresh();
+            debouncedChange();
+        };
+    }
+
     searchInput.addEventListener('input', debouncedChange);
-    [creationMin, creationMax, firstAlbumMin, firstAlbumMax, membersMin, membersMax].forEach(function (el) {
-        if (el) {
-            el.addEventListener('input', debouncedChange);
-        }
+    Object.keys(sliders).forEach(function (k) {
+        const s = sliders[k];
+        s.minThumb.addEventListener('input', onSliderInput(s));
+        s.maxThumb.addEventListener('input', onSliderInput(s));
     });
     if (locationsRoot) {
         locationsRoot.addEventListener('change', debouncedChange);
@@ -171,11 +236,7 @@ function init() {
     if (resetButton) {
         resetButton.addEventListener('click', function () {
             searchInput.value = '';
-            [creationMin, creationMax, firstAlbumMin, firstAlbumMax, membersMin, membersMax].forEach(function (el) {
-                if (el) {
-                    el.value = '';
-                }
-            });
+            Object.keys(sliders).forEach(function (k) { sliders[k].reset(); });
             if (locationsRoot) {
                 const boxes = locationsRoot.querySelectorAll('input[type="checkbox"]:checked');
                 for (let i = 0; i < boxes.length; i++) {
