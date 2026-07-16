@@ -21,40 +21,52 @@
     </div>
 
     <div class="filter-range-group">
-        <fieldset class="filter-range">
+        <fieldset class="filter-range" data-range="creation">
             <legend>Creation date</legend>
-            <label>
-                Min
-                <input type="number" id="filter-creation-min" class="filter-range-input" placeholder="e.g. 1970">
-            </label>
-            <label>
-                Max
-                <input type="number" id="filter-creation-max" class="filter-range-input" placeholder="e.g. 2000">
-            </label>
+            <div class="range-slider">
+                <div class="range-track"></div>
+                <div class="range-fill" data-fill></div>
+                <input type="range" id="filter-creation-min" class="range-thumb range-thumb--min"
+                    min="{{.Bounds.CreationMin}}" max="{{.Bounds.CreationMax}}" value="{{.Bounds.CreationMin}}">
+                <input type="range" id="filter-creation-max" class="range-thumb range-thumb--max"
+                    min="{{.Bounds.CreationMin}}" max="{{.Bounds.CreationMax}}" value="{{.Bounds.CreationMax}}">
+            </div>
+            <div class="range-values">
+                <span data-value-min>{{.Bounds.CreationMin}}</span>
+                <span data-value-max>{{.Bounds.CreationMax}}</span>
+            </div>
         </fieldset>
 
-        <fieldset class="filter-range">
+        <fieldset class="filter-range" data-range="first-album">
             <legend>First album year</legend>
-            <label>
-                Min
-                <input type="number" id="filter-first-album-min" class="filter-range-input" placeholder="e.g. 1990">
-            </label>
-            <label>
-                Max
-                <input type="number" id="filter-first-album-max" class="filter-range-input" placeholder="e.g. 2000">
-            </label>
+            <div class="range-slider">
+                <div class="range-track"></div>
+                <div class="range-fill" data-fill></div>
+                <input type="range" id="filter-first-album-min" class="range-thumb range-thumb--min"
+                    min="{{.Bounds.FirstAlbumMin}}" max="{{.Bounds.FirstAlbumMax}}" value="{{.Bounds.FirstAlbumMin}}">
+                <input type="range" id="filter-first-album-max" class="range-thumb range-thumb--max"
+                    min="{{.Bounds.FirstAlbumMin}}" max="{{.Bounds.FirstAlbumMax}}" value="{{.Bounds.FirstAlbumMax}}">
+            </div>
+            <div class="range-values">
+                <span data-value-min>{{.Bounds.FirstAlbumMin}}</span>
+                <span data-value-max>{{.Bounds.FirstAlbumMax}}</span>
+            </div>
         </fieldset>
 
-        <fieldset class="filter-range">
+        <fieldset class="filter-range" data-range="members">
             <legend>Number of members</legend>
-            <label>
-                Min
-                <input type="number" id="filter-members-min" class="filter-range-input" min="1" placeholder="e.g. 1">
-            </label>
-            <label>
-                Max
-                <input type="number" id="filter-members-max" class="filter-range-input" min="1" placeholder="e.g. 6">
-            </label>
+            <div class="range-slider">
+                <div class="range-track"></div>
+                <div class="range-fill" data-fill></div>
+                <input type="range" id="filter-members-min" class="range-thumb range-thumb--min"
+                    min="{{.Bounds.MembersMin}}" max="{{.Bounds.MembersMax}}" value="{{.Bounds.MembersMin}}">
+                <input type="range" id="filter-members-max" class="range-thumb range-thumb--max"
+                    min="{{.Bounds.MembersMin}}" max="{{.Bounds.MembersMax}}" value="{{.Bounds.MembersMax}}">
+            </div>
+            <div class="range-values">
+                <span data-value-min>{{.Bounds.MembersMin}}</span>
+                <span data-value-max>{{.Bounds.MembersMax}}</span>
+            </div>
         </fieldset>
     </div>
 
