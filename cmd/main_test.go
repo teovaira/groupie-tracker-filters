@@ -38,6 +38,10 @@ func (r *routeStore) LocationGroups() []models.LocationGroup {
 	return nil
 }
 
+func (r *routeStore) FilterBounds() models.FilterBounds {
+	return models.FilterBounds{}
+}
+
 func (r *routeStore) ArtistPageDataByID(id int) (models.ArtistPageData, bool) {
 	if id == 1 {
 		return models.ArtistPageData{
