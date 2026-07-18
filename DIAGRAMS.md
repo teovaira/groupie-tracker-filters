@@ -10,7 +10,7 @@ flowchart TD
     A -->|"GET /api/filter?..."| Y[FilterHandler]
     A -->|"GET /static/..."| E[FileServer]
 
-    B --> F[store.AllArtists + store.LocationGroups]
+    B --> F[store.AllArtists + store.LocationGroups + store.FilterBounds]
     C -->|valid numeric ID| G[store.ArtistPageDataByID]
     C -->|non-numeric or unknown ID| Q[404 Not Found]
     D -->|empty query| P[400 Bad Request]
