@@ -72,7 +72,7 @@ make check      # full pre-PR check (fmt + lint + build + test)
 
 - **Vasiliki** — Backend: API client, models, store, search handler, geo package
 - **Krysta** — Frontend: templates, CSS
-- **Theo** — Full-stack: handlers, search.js, docs, QA
+- **Theo** — Full-stack: handlers, search.js, filters, docs, QA
 
 ## License
 
