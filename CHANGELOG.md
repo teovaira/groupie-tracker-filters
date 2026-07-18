@@ -5,27 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2.0] - 2026-07-15
+## [1.2.0] - 2026-07-18
 
 ### Added
 - `FilterCriteria` struct and `Store.FilterArtists(query, criteria)` for combined free-text and structured artist filtering
-- Range filters for creation date, first album year, and number of members
+- Dual-handle range sliders for creation date, first album year, and number of members — one bar per filter with a min and max thumb, a value bubble riding above each thumb to show the current value while dragging, and the data range labelled at each end
+- `Store.FilterBounds()` and `models.FilterBounds` deriving the min/max creation year, first-album year, and member count from the full dataset, so each slider spans the real data instead of arbitrary endpoints
 - Checkbox filter for concert locations, grouped by country and matched with substring semantics (e.g. a `washington-usa` selection also matches a more specific `seattle-washington-usa` slug)
 - `Store.LocationGroups()` and `models.LocationGroup`/`models.HomePageData` to populate the location checkbox filter from the full, unfiltered location vocabulary
 - `GET /api/filter` endpoint, mirroring `/api/search`'s JSON contract, accepting `q`, `creation_min`/`creation_max`, `first_album_min`/`first_album_max`, `members_min`/`members_max`, and repeated `locations` query parameters — all optional, so no parameters returns every artist
 - Goroutine worker pool in `RealStore.FilterArtists`, fanning artist-predicate evaluation across `runtime.NumCPU()` workers, with results re-sorted back into deterministic input order after collection
-- Filter panel UI on the home page: range inputs plus collapsible, country-grouped location checkboxes
-- `filter.js` — debounced, asynchronous wiring of the filter panel and the existing search box to `/api/filter`, so search and filters combine live without a page reload
-- Filter panel styling matching the existing dark-theme design system
-- Full test coverage for the filtering feature: `matchesCriteria`, `RealStore`/`MockStore` `FilterArtists` and `LocationGroups`, `FilterHandler`, route wiring, and `filter.js`'s `buildFilterQuery`
+- Filter panel UI on the home page: range sliders plus collapsible, country-grouped location checkboxes
+- `filter.js` — debounced, asynchronous wiring of the filter panel and the existing search box to `/api/filter`, so search and filters combine live without a page reload; a slider left at its full span sends no bound for that dimension, keeping untouched sliders equivalent to "show all"
+- Filter panel styling matching the existing dark-theme design system, with the location groups laid out in independent columns so expanding one country does not disturb its neighbours
+- Full test coverage for the filtering feature: `matchesCriteria`, `RealStore`/`MockStore` `FilterArtists`, `LocationGroups`, and `FilterBounds`, `FilterHandler`, route wiring, and `filter.js`'s `buildFilterQuery` and `sliderRangeState`
 
 ### Changed
 - Go module renamed from `groupie-tracker-geolocalization` to `groupie-tracker-filters`, along with the Nominatim `User-Agent` header, build binary name, and repository links, to match the new feature and repository
-- `HomeHandler` now passes `models.HomePageData{Artists, LocationGroups}` to the home template instead of a raw artist slice
+- `HomeHandler` now passes `models.HomePageData{Artists, LocationGroups, Bounds}` to the home template instead of a raw artist slice
 - `search.js` no longer self-initializes; `filter.js` now owns `#search-results` and reads the search box as part of the combined `/api/filter` request
 
 ### Fixed
-- `FilterHandler` normalizes a nil `FilterArtists` result to an empty JSON array (`[]`) rather than `null`, matching `/api/search`'s existing contract
+- `FilterHandler` normalizes a nil `FilterArtists` result to an empty JSON array (`[]`) rather than `null`, matching `/api/search`'s documented contract
+- `/api/search` likewise now returns `[]` instead of `null` when no artists match, honouring its own documented contract
+- `RealStore.ArtistPageDataByID` reuses the `locationsForArtist` helper instead of duplicating the location-lookup loop
 
 ## [1.1.0] - 2026-07-12
 
