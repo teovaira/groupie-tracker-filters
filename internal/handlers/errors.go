@@ -23,7 +23,7 @@ func BadRequestHandler(tmpl *template.Template) http.HandlerFunc {
 			return
 		}
 		w.WriteHeader(http.StatusBadRequest)
-		buf.WriteTo(w)
+		buf.WriteTo(w) //nolint:errcheck // response write errors are unrecoverable
 	}
 }
 
@@ -39,7 +39,7 @@ func NotFoundHandler(tmpl *template.Template) http.HandlerFunc {
 			return
 		}
 		w.WriteHeader(http.StatusNotFound)
-		buf.WriteTo(w)
+		buf.WriteTo(w) //nolint:errcheck // response write errors are unrecoverable
 	}
 }
 
@@ -55,7 +55,7 @@ func StatusInternalServerError(tmpl *template.Template) http.HandlerFunc {
 			return
 		}
 		w.WriteHeader(http.StatusInternalServerError)
-		buf.WriteTo(w)
+		buf.WriteTo(w) //nolint:errcheck // response write errors are unrecoverable
 	}
 }
 
