@@ -5,6 +5,7 @@
 package handlers
 
 import (
+	"bytes"
 	"html/template"
 	"log"
 	"net/http"
@@ -15,12 +16,14 @@ import (
 // with a missing or empty required query parameter, such as ?q= in /api/search.
 func BadRequestHandler(tmpl *template.Template) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusBadRequest)
-		err := tmpl.ExecuteTemplate(w, "400.html", nil)
-		if err != nil {
+		var buf bytes.Buffer
+		if err := tmpl.ExecuteTemplate(&buf, "400.html", nil); err != nil {
 			log.Print(err)
 			http.Error(w, "bad request", http.StatusBadRequest)
+			return
 		}
+		w.WriteHeader(http.StatusBadRequest)
+		buf.WriteTo(w)
 	}
 }
 
@@ -29,12 +32,14 @@ func BadRequestHandler(tmpl *template.Template) http.HandlerFunc {
 // back to a plain-text http.Error to ensure the client always receives a response.
 func NotFoundHandler(tmpl *template.Template) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusNotFound)
-		err := tmpl.ExecuteTemplate(w, "404.html", nil)
-		if err != nil {
+		var buf bytes.Buffer
+		if err := tmpl.ExecuteTemplate(&buf, "404.html", nil); err != nil {
 			log.Print(err)
 			http.Error(w, "not found", http.StatusNotFound)
+			return
 		}
+		w.WriteHeader(http.StatusNotFound)
+		buf.WriteTo(w)
 	}
 }
 
@@ -44,11 +49,13 @@ func NotFoundHandler(tmpl *template.Template) http.HandlerFunc {
 // If the template fails to execute, it falls back to a plain-text http.Error.
 func StatusInternalServerError(tmpl *template.Template) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusInternalServerError)
-		err := tmpl.ExecuteTemplate(w, "500.html", nil)
-		if err != nil {
+		var buf bytes.Buffer
+		if err := tmpl.ExecuteTemplate(&buf, "500.html", nil); err != nil {
 			http.Error(w, "internal server error", http.StatusInternalServerError)
+			return
 		}
+		w.WriteHeader(http.StatusInternalServerError)
+		buf.WriteTo(w)
 	}
 }
 
