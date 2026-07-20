@@ -39,7 +39,7 @@ function assertContains(str, substr, msg) {
 // search.js must export { debounce, renderCards } when run under Node.
 // ---------------------------------------------------------------------------
 
-const { debounce, renderCards } = require('./search.js');
+const { debounce, renderCards, escapeHTML } = require('./search.js');
 
 // ---------------------------------------------------------------------------
 // debounce tests
@@ -131,6 +131,42 @@ test('escapes HTML special characters in name', () => {
     if (html.includes('<img src=x onerror')) {
         throw new Error('name was not escaped — raw <img> injected into output');
     }
+});
+
+test('escapes HTML special characters in image URL', () => {
+    const artists = [
+        { id: 4, name: 'Safe Name', image: '"><script>alert(1)</script>', creationDate: 1980 }
+    ];
+    const html = renderCards(artists);
+    // The image field feeds the src attribute; a quote-break payload must be
+    // escaped so it cannot close the attribute and inject a <script> tag.
+    assertContains(html, '&quot;&gt;&lt;script&gt;');
+    if (html.includes('<script>')) {
+        throw new Error('image was not escaped — raw <script> injected into output');
+    }
+});
+
+// ---------------------------------------------------------------------------
+// escapeHTML tests
+// ---------------------------------------------------------------------------
+
+console.log('\nescapeHTML');
+
+test('escapes all five special characters', () => {
+    assertEqual(escapeHTML('<a href="x">\'&\''), '&lt;a href=&quot;x&quot;&gt;&#39;&amp;&#39;');
+});
+
+test('escapes ampersand first to avoid double-escaping', () => {
+    // If & were escaped after < , the output would contain &amp;lt;.
+    assertEqual(escapeHTML('a & b < c'), 'a &amp; b &lt; c');
+});
+
+test('coerces non-string input to string', () => {
+    assertEqual(escapeHTML(1973), '1973');
+});
+
+test('leaves plain text unchanged', () => {
+    assertEqual(escapeHTML('Foo Fighters'), 'Foo Fighters');
 });
 
 // ---------------------------------------------------------------------------
