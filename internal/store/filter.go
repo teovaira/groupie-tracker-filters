@@ -68,15 +68,18 @@ func matchesCriteria(a models.Artist, locations []string, c FilterCriteria) bool
 }
 
 // anyLocationMatches reports whether any of an artist's resolved concert
-// locations matches any of the wanted location slugs. Matching is substring-based
-// (via strings.Contains) rather than exact-equality so that a hierarchical
-// wanted value like "washington-usa" also matches a more specific artist
-// location such as "seattle-washington-usa", per the location-hierarchy
-// behaviour the spec requires.
+// locations matches any of the wanted location slugs. Matching is segment-based:
+// both sides are wrapped in "-" delimiters so a wanted value only matches on
+// full hyphen boundaries. This preserves the location-hierarchy behaviour the
+// spec requires — a hierarchical wanted value like "washington-usa" still
+// matches a more specific artist location such as "seattle-washington-usa" —
+// while preventing a wanted slug from matching as a non-hierarchical substring
+// of an unrelated location.
 func anyLocationMatches(artistLocations []string, wanted []string) bool {
 	for _, loc := range artistLocations {
+		locB := "-" + loc + "-"
 		for _, w := range wanted {
-			if strings.Contains(loc, w) {
+			if strings.Contains(locB, "-"+w+"-") {
 				return true
 			}
 		}
