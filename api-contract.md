@@ -205,7 +205,7 @@ Response fields match the `Artist` shape documented under `GET /artists` above.
 
 **Notes**
 - All parameters combine with a logical AND — passing both `q` and range/checkbox criteria narrows the result further than either alone
-- `locations` matching is substring-based, not exact — a value like `washington-usa` also matches a more specific artist location such as `seattle-washington-usa`
+- `locations` matching is hyphen-boundary based, not exact — a value only matches on full segment boundaries, so a hierarchical value like `washington-usa` still matches a more specific artist location such as `seattle-washington-usa`, but cannot match as a non-hierarchical substring of an unrelated location
 - Returns empty array `[]` when no artists match — never `null`
 - Every parameter is optional; a request with no parameters at all returns every artist
 
