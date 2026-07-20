@@ -21,8 +21,30 @@ function debounce(fn, delay) {
 }
 
 /**
+ * escapeHTML escapes the five HTML special characters so that untrusted values
+ * (artist names, image URLs) can be safely interpolated into an HTML string
+ * before assignment to innerHTML. Server-rendered pages get this for free from
+ * Go's html/template; client-side renderCards must do it explicitly. Uses a
+ * plain regex rather than a DOM node so it behaves identically under Node
+ * (where search.test.js runs) and in the browser.
+ *
+ * @param {*} s - value to escape; coerced to string
+ * @returns {string} the input with & < > " ' replaced by their entities
+ */
+function escapeHTML(s) {
+    return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+/**
  * renderCards builds an HTML string of artist card links from an array of
  * artist objects. Each object must have id, name, image, and creationDate.
+ * All interpolated fields are escaped via escapeHTML so a malicious or
+ * malformed value cannot inject markup when the result is assigned to innerHTML.
  *
  * @param {Array<{id: number, name: string, image: string, creationDate: number}>} artists
  * @returns {string} HTML string of artist cards, or an empty string if the array is empty
@@ -34,11 +56,11 @@ function renderCards(artists) {
     let html = '';
     for (let i = 0; i < artists.length; i++) {
         const a = artists[i];
-        html += '<a href="/artist/' + a.id + '" class="artist-card">' +
-            '<img src="' + a.image + '" alt="' + a.name + '">' +
+        html += '<a href="/artist/' + encodeURIComponent(a.id) + '" class="artist-card">' +
+            '<img src="' + escapeHTML(a.image) + '" alt="' + escapeHTML(a.name) + '">' +
             '<div class="artist-card-info">' +
-            '<h2>' + a.name + '</h2>' +
-            '<p>Since ' + a.creationDate + '</p>' +
+            '<h2>' + escapeHTML(a.name) + '</h2>' +
+            '<p>Since ' + escapeHTML(a.creationDate) + '</p>' +
             '</div>' +
             '</a>';
     }
@@ -49,8 +71,9 @@ function renderCards(artists) {
 // filter.js to reuse in the browser, where it drives #search-input directly
 // as part of the combined search+filter request in /api/filter.
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { debounce, renderCards };
+    module.exports = { debounce, renderCards, escapeHTML };
 } else {
     window.debounce = debounce;
     window.renderCards = renderCards;
+    window.escapeHTML = escapeHTML;
 }

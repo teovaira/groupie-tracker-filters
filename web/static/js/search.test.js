@@ -120,14 +120,17 @@ test('returns empty string for empty array', () => {
     assertEqual(html, '', 'empty array should produce empty string');
 });
 
-test('escapes special characters in name', () => {
+test('escapes HTML special characters in name', () => {
     const artists = [
-        { id: 3, name: 'AC/DC', image: 'http://img/acdc.jpg', creationDate: 1973 }
+        { id: 3, name: '<img src=x onerror=alert(1)>', image: 'http://img/x.jpg', creationDate: 1973 }
     ];
     const html = renderCards(artists);
     assertContains(html, '/artist/3');
-    // name appears in alt and h2 — both must be present
-    assertContains(html, 'AC/DC');
+    // The dangerous name must appear only in escaped form, never as raw markup.
+    assertContains(html, '&lt;img src=x onerror=alert(1)&gt;');
+    if (html.includes('<img src=x onerror')) {
+        throw new Error('name was not escaped — raw <img> injected into output');
+    }
 });
 
 // ---------------------------------------------------------------------------
